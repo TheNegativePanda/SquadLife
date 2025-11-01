@@ -1,0 +1,34 @@
+command /testselect:
+    trigger:
+        SelectGroups(all players)
+
+
+local function SelectGroups(p: players):
+    clear {SquadLife::Data::*}
+    loop ceil(size of {_p::*} / 4) times:
+        clear {_rp::*}
+        loop 4 times:
+            set {_rp::%loop-iteration-2%} to uuid of (a random element out of {_p::*} where [{_rp::*} does not contain uuid of input])
+            broadcast {_rp::*}
+        loop 4 times:
+            set {SquadLife::Data::%{_rp::%loop-iteration-2%}%::Soulbounds::*} to {_rp::*} where [input != {_rp::%loop-iteration-2%}'s uuid]
+            broadcast "&a%players from {SquadLife::Data::%{_rp::%loop-iteration-2%}%::Soulbounds::*}%"
+
+    
+on damage of player:
+    wait 1 tick
+    loop players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}:
+        if all:
+            victim isn't blocking
+            damage cause isn't unknown
+            loop-value is online
+        then:
+            damage loop-value by final damage
+            if loop-value is alive:
+                set loop-value's health to victim's health  
+
+on death of player:
+    wait 1 tick
+    loop players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}:
+        if loop-value is alive:
+            kill loop-value
