@@ -3,7 +3,7 @@ command /testselect:
         SelectGroups(all players)
 
 
-local function SelectGroups(p: players):
+local function SelectGroups(p: players = all players):
     clear {SquadLife::Data::*}
     loop ceil(size of {_p::*} / 4) times:
         clear {_rp::*}
@@ -13,6 +13,17 @@ local function SelectGroups(p: players):
         loop 4 times:
             set {SquadLife::Data::%{_rp::%loop-iteration-2%}%::Soulbounds::*} to {_rp::*} where [input != {_rp::%loop-iteration-2%}'s uuid]
             broadcast "&a%players from {SquadLife::Data::%{_rp::%loop-iteration-2%}%::Soulbounds::*}%"
+
+
+local function SplitGroup(id: uuids):
+    set {_size} to size of {_id::*}
+    loop 2 times:
+        #set {_newGroups::}
+    
+    loop {_id::*}:
+        clear {SquadLife::Data::%{_id::%loop-iteration%}%::Soulbounds::*}
+    
+    
 
     
 on damage of player:
@@ -28,6 +39,12 @@ on damage of player:
                 set loop-value's health to victim's health  
 
 on death of player:
+    if {SquadLife::Session} = true:
+        remove 1 from {SquadLife::Data::%victim's uuid%::Lives}
+        if {SquadLife::Data::%victim's uuid%::Lives} = 3:
+            SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
+
+
     wait 1 tick
     loop players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}:
         if loop-value is alive:
