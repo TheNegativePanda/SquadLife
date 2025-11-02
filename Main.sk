@@ -2,28 +2,36 @@ command /testselect:
     trigger:
         SelectGroups(all players)
 
+command /testsplit:
+    description: description
+    permission: permission
+    trigger:
+        SplitGroup({SquadLife::Data::%sender's uuid%::Soulbounds::*} and uuid of sender)
 
 local function SelectGroups(p: players = all players):
     clear {SquadLife::Data::*}
     loop ceil(size of {_p::*} / 4) times:
         clear {_rp::*}
         loop 4 times:
-            set {_rp::%loop-iteration-2%} to uuid of (a random element out of {_p::*} where [{_rp::*} does not contain uuid of input])
-            broadcast {_rp::*}
-        loop 4 times:
-            set {SquadLife::Data::%{_rp::%loop-iteration-2%}%::Soulbounds::*} to {_rp::*} where [input != {_rp::%loop-iteration-2%}'s uuid]
-            broadcast "&a%players from {SquadLife::Data::%{_rp::%loop-iteration-2%}%::Soulbounds::*}%"
+            set {_rp::%loop-iteration-2%} to uuid of (a random element out of {_p::*} where [{_rp::*} does not contain uuid of input]) #where [{SquadLife::Data::%uuid of input%::Soulbounds::*} doesn't exist]
+            remove (player from {_rp::%loop-iteration-2%}) from {_p::*}
+        loop {_rp::*}:
+            set {SquadLife::Data::%loop-value-2%::Soulbounds::*} to {_rp::*} where [input != loop-value-2]
+            send "&a%players from {SquadLife::Data::%loop-value-2%::Soulbounds::*}%" to player from loop-value-2
 
 
 local function SplitGroup(id: uuids):
-    set {_size} to size of {_id::*}
-    loop 2 times:
-        #set {_newGroups::}
-    
     loop {_id::*}:
-        clear {SquadLife::Data::%{_id::%loop-iteration%}%::Soulbounds::*}
-    
-    
+        clear {SquadLife::Data::%loop-value%::Soulbounds::*}
+    loop 2 times:
+        clear {_rp::*}
+        loop ceil(size of {_id::*} / 2) times:
+            set {_rp::%loop-iteration-2%} to (a random element out of {_id::*} where [{_rp::*} does not contain input])
+            remove {_rp::%loop-iteration-2%} from {_id::*} 
+        loop {_rp::*}:
+            set {SquadLife::Data::%loop-value-2%::Soulbounds::*} to {_rp::*} where [input != loop-value-2]
+            send "%players from {SquadLife::Data::%loop-value-2%::Soulbounds::*}%" to player from loop-value-2
+        
 
     
 on damage of player:
@@ -37,6 +45,17 @@ on damage of player:
             damage loop-value by final damage
             if loop-value is alive:
                 set loop-value's health to victim's health  
+            if victim isn't alive:
+                damage loop-value by health of loop-value
+on heal:
+    wait 1 tick
+    loop players from {SquadLife::Data::%player's uuid%::Soulbounds::*}:
+        if all:
+            heal reason isn't unknown
+            loop-value is online
+            loop-value is alive
+        then:
+            set health of loop-value to health of player
 
 on death of player:
     if {SquadLife::Session} = true:
@@ -45,7 +64,7 @@ on death of player:
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
 
 
-    wait 1 tick
-    loop players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}:
-        if loop-value is alive:
-            kill loop-value
+    # wait 1 tick 
+    # loop players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}:
+    #     if loop-value is alive:
+    #         kill loop-value
