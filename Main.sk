@@ -1,6 +1,6 @@
 command /testselect:
     trigger:
-        SelectGroups(all players)
+        Start(all players)
 
 command /testsplit:
     description: description
@@ -23,17 +23,42 @@ local function SelectGroups(p: players = all players):
 local function SplitGroup(id: uuids):
     loop {_id::*}:
         clear {SquadLife::Data::%loop-value%::Soulbounds::*}
+    set {_size} to size of {_id::*} 
     loop 2 times:
         clear {_rp::*}
-        loop ceil(size of {_id::*} / 2) times:
+        loop ceil({_size} / 2) times:
             set {_rp::%loop-iteration-2%} to (a random element out of {_id::*} where [{_rp::*} does not contain input])
             remove {_rp::%loop-iteration-2%} from {_id::*} 
         loop {_rp::*}:
             set {SquadLife::Data::%loop-value-2%::Soulbounds::*} to {_rp::*} where [input != loop-value-2]
             send "%players from {SquadLife::Data::%loop-value-2%::Soulbounds::*}%" to player from loop-value-2
-        
+   
+local function UpdateTeam(p: player):
+    set {_color::*} to light red, yellow, lime, light blue, light purple
+    set team color of team of {_p} to {_color::%{SquadLife::Data::%{_p}'s uuid%::Lives}%}
+    if {SquadLife::Data::%{_p}'s uuid%::Lives} <= 0:
+        set team color of team of {_p} to gray
+    else if {SquadLife::Data::%{_p}'s uuid%::Lives} > 5:
+        set team color of team of {_p} to light purple
 
-    
+local function Start(players: players = all players):
+    loop 3 times:
+        send title "&a&l%4 - loop-iteration%" to {_players::*} 
+        play sound "ui.button.click" to {_players::*}
+        wait 2 seconds
+    send title "&a&lYour Soulmates are..." to {_players::*} 
+    play sound "entity.breeze.inhale" to {_players::*}
+    SelectGroups({_players::*})
+    loop {_players::*}:
+        if team of loop-value isn't set:
+            add loop-value to team named "%loop-value%"
+        set {SquadLife::Data::%loop-value's uuid%::Lives} to 5
+        UpdateTeam(loop-value)
+    wait 1 second
+    loop {_players::*}: 
+        send title "&a%players from {SquadLife::Data::%uuid of loop-value%::Soulbounds::*}%" to loop-value
+        play sound "block.note_block.bell" to loop-value
+
 on damage of player:
     wait 1 tick
     loop players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}:
@@ -58,13 +83,18 @@ on heal:
             set health of loop-value to health of player
 
 on death of player:
-    if {SquadLife::Session} = true:
+    if {SquadLife::Session} != true:
         remove 1 from {SquadLife::Data::%victim's uuid%::Lives}
-        if {SquadLife::Data::%victim's uuid%::Lives} = 3:
+        UpdateTeam(victim)
+        if {SquadLife::Data::%victim's uuid%::Lives} = 0:
+            strike lightning effect at victim
+            send title "&c&l%victim%" with subtitle "&f&lhas been eliminated!" to all players
+            set gamemode of victim to spectator
+        if all:
+            damage cause isn't custom
+            {SquadLife::Data::%victim's uuid%::Lives} = 3 or 1
+        then:
+            wait 1 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
-
-
-    # wait 1 tick 
-    # loop players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}:
-    #     if loop-value is alive:
-    #         kill loop-value
+       
+    
