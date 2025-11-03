@@ -2,7 +2,7 @@ command /testselect:
     trigger:
         Start(all players)
 
-command /testsplit:
+command /tesltsplit:
     description: description
     permission: permission
     trigger:
@@ -13,12 +13,10 @@ local function SelectGroups(p: players = all players):
     loop ceil(size of {_p::*} / 4) times:
         clear {_rp::*}
         loop 4 times:
-            set {_rp::%loop-iteration-2%} to uuid of (a random element out of {_p::*} where [{_rp::*} does not contain uuid of input]) #where [{SquadLife::Data::%uuid of input%::Soulbounds::*} doesn't exist]
+            set {_rp::%loop-iteration-2%} to uuid of (a random element out of {_p::*})
             remove (player from {_rp::%loop-iteration-2%}) from {_p::*}
         loop {_rp::*}:
             set {SquadLife::Data::%loop-value-2%::Soulbounds::*} to {_rp::*} where [input != loop-value-2]
-            send "&a%players from {SquadLife::Data::%loop-value-2%::Soulbounds::*}%" to player from loop-value-2
-
 
 local function SplitGroup(id: uuids):
     loop {_id::*}:
@@ -31,8 +29,7 @@ local function SplitGroup(id: uuids):
             remove {_rp::%loop-iteration-2%} from {_id::*} 
         loop {_rp::*}:
             set {SquadLife::Data::%loop-value-2%::Soulbounds::*} to {_rp::*} where [input != loop-value-2]
-            send "%players from {SquadLife::Data::%loop-value-2%::Soulbounds::*}%" to player from loop-value-2
-   
+            
 local function UpdateTeam(p: player):
     set {_color::*} to light red, yellow, lime, light blue, light purple
     set team color of team of {_p} to {_color::%{SquadLife::Data::%{_p}'s uuid%::Lives}%}
@@ -55,9 +52,12 @@ local function Start(players: players = all players):
         set {SquadLife::Data::%loop-value's uuid%::Lives} to 5
         UpdateTeam(loop-value)
     wait 1 second
-    loop {_players::*}: 
-        send title "&a%players from {SquadLife::Data::%uuid of loop-value%::Soulbounds::*}%" to loop-value
-        play sound "block.note_block.bell" to loop-value
+    send title "&a&l???" to {_players::*}
+    play sound "block.note_block.bell" to {_players::*}
+    damage {_players::*} by 0.1
+    # loop {_players::*}: 
+    #     send title "&a%players from {SquadLife::Data::%uuid of loop-value%::Soulbounds::*}%" to loop-value
+    #     play sound "block.note_block.bell" to loop-value
 
 on damage of player:
     wait 1 tick
@@ -97,4 +97,6 @@ on death of player:
             wait 1 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
        
+local function Eliminate(p: player, msg: string):
+    make 100 of dust using dustOption(red, 1.5) at {_p} with offset vector(1,1,1) with force
     
