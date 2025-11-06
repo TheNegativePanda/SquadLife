@@ -83,13 +83,20 @@ on heal:
             set health of loop-value to health of player
 
 on death of player:
+    if all: 
+        {SquadLife::Data::%victim's uuid%::Lives} <= 0
+        {-dm::%victim%} is set
+    then:
+        set death message to "&c%{-dm::%victim%}%"
+        delete {-dm::%victim%}
+    {SquadLife::Data::%victim's uuid%::Lives} > 0
     if {SquadLife::Session} != true:
         remove 1 from {SquadLife::Data::%victim's uuid%::Lives}
         UpdateTeam(victim)
         if {SquadLife::Data::%victim's uuid%::Lives} = 0:
-            strike lightning effect at victim
-            send title "&c&l%victim%" with subtitle "&f&lhas been eliminated!" to all players
-            set gamemode of victim to spectator
+            cancel event
+            Eliminate(victim)
+            set {-dm::%victim%} to uncolored death message
         if all:
             damage cause isn't custom
             {SquadLife::Data::%victim's uuid%::Lives} = 3 or 1
@@ -100,17 +107,40 @@ on death of player:
 local function Eliminate(p: player, msg: string = "none"):
     make 100 of dust using dustOption(red, 1.5) at {_p} with offset vector(1,1,1) with force
     set {_loc} to location of {_p}
-    loop (400 - y-coordinate of {_loc}) times:
-        set {_offsetY} to 400 - loop-iteration
-        make 50 of dust using dustOption(light purple, 2) at ({_loc} ~ vector({_offsetY} * 0.2, {_offsetY}, {_offsetY} * 0.2)) with offset vector(1,1,1) with force
-        make 50 of dust using dustOption(light blue, 2) at ({_loc} ~ vector({_offsetY} * (-0.2), {_offsetY}, {_offsetY} * 0.2)) with offset vector(1,1,1) with force
-        make 50 of dust using dustOption(lime, 2) at ({_loc} ~ vector({_offsetY} * 0.2, {_offsetY}, {_offsetY} * (-0.2))) with offset vector(1,1,1) with force
-        make 50 of dust using dustOption(yellow, 2) at ({_loc} ~ vector({_offsetY} * (-0.2), {_offsetY}, {_offsetY} * (-0.2))) with offset vector(1,1,1) with force
-        make 50 of dust using dustOption(red, 2) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector(1,1,1) with force
+    set {_d} to 400 - altitude of {_loc} 
+    set {Elim::%{_p}%} to true
+    loop ({_d} / 4) times:
+        set {_offsetY} to {_d} - loop-iteration * 4
+        set {_dx} to 50 * 0.95 ^ (loop-iteration)
+        make 100 of dust using dustOption(light purple, 3) at ({_loc} ~ vector({_offsetY} * 0.2, {_offsetY}, {_offsetY} * 0.2)) with offset vector({_dx},{_dx},{_dx}) with force
+        make 100 of dust using dustOption(light blue, 3) at ({_loc} ~ vector({_offsetY} * (-0.2), {_offsetY}, {_offsetY} * 0.2)) with offset vector({_dx},{_dx},{_dx}) with force
+        make 100 of dust using dustOption(lime, 3) at ({_loc} ~ vector({_offsetY} * 0.2, {_offsetY}, {_offsetY} * (-0.2))) with offset vector({_dx},{_dx},{_dx}) with force
+        make 100 of dust using dustOption(yellow, 3) at ({_loc} ~ vector({_offsetY} * (-0.2), {_offsetY}, {_offsetY} * (-0.2))) with offset vector({_dx},{_dx},{_dx}) with force
+        make 100 of dust using dustOption(red, 3) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector({_dx},{_dx},{_dx}) with force
         wait 1 tick
+    make 100 of flash at {_p} with offset vector(1,1,1) with force
+    strike lightning effect at {_p}
+    drop items in inventory of {_p} at {_p}
+    play sound "entity.allay.death" to all players
+    send title "&c&l%{_p}%" with subtitle "&f&lhas been eliminated!" to all players where [input != {_p}]
+    send title "&c&lYou have ran out of lives!" to {_p}
+    delete {Elim::%{_p}%}
+    kill {_p}
+    set game mode of {_p} to spectator
+
+on player move:
+    if {Elim::%player%} is true:
+        cancel event
+
+on damage:
+    if any: 
+        {Elim::%attacker%} is true
+        {Elim::%victim%} is true
+    then:
+        cancel event
 
 command /testanimation:
     description: description
     permission: permission
     trigger:
-        Eliminate()
+        Eliminate(player)
