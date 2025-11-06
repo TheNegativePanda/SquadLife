@@ -97,6 +97,20 @@ on death of player:
             wait 1 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
        
-local function Eliminate(p: player, msg: string):
+local function Eliminate(p: player, msg: string = "none"):
     make 100 of dust using dustOption(red, 1.5) at {_p} with offset vector(1,1,1) with force
-    
+    set {_loc} to location of {_p}
+    loop (400 - y-coordinate of {_loc}) times:
+        set {_offsetY} to 400 - loop-iteration
+        make 50 of dust using dustOption(light purple, 2) at ({_loc} ~ vector({_offsetY} * 0.2, {_offsetY}, {_offsetY} * 0.2)) with offset vector(1,1,1) with force
+        make 50 of dust using dustOption(light blue, 2) at ({_loc} ~ vector({_offsetY} * (-0.2), {_offsetY}, {_offsetY} * 0.2)) with offset vector(1,1,1) with force
+        make 50 of dust using dustOption(lime, 2) at ({_loc} ~ vector({_offsetY} * 0.2, {_offsetY}, {_offsetY} * (-0.2))) with offset vector(1,1,1) with force
+        make 50 of dust using dustOption(yellow, 2) at ({_loc} ~ vector({_offsetY} * (-0.2), {_offsetY}, {_offsetY} * (-0.2))) with offset vector(1,1,1) with force
+        make 50 of dust using dustOption(red, 2) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector(1,1,1) with force
+        wait 1 tick
+
+command /testanimation:
+    description: description
+    permission: permission
+    trigger:
+        Eliminate()
