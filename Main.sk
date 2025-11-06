@@ -144,3 +144,17 @@ command /testanimation:
     permission: permission
     trigger:
         Eliminate(player)
+
+
+local function circle(center: location, r: number, color: color = (dark purple)):
+    loop 361 times:
+        set {_x} to {_r} * cos(loop-iteration - 1)
+        set {_z} to {_r} * sin(loop-iteration - 1)
+        set {_loc} to {_center} offset by vector({_x}, 0, {_z})
+        make 5 of dust using dustOption({_color}, 1) at {_loc} with delta vector(0, 0, 0) with force
+        wait 1 tick
+command /circle:
+    description: description
+    permission: permission
+    trigger:
+        circle(location of player, 5, blue)
