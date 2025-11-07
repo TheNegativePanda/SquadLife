@@ -109,13 +109,13 @@ local function Eliminate(p: player, msg: string = "none"):
     set {_loc} to location of {_p}
     set {_d} to 400 - altitude of {_loc} 
     set {Elim::%{_p}%} to true
-    loop ({_d} / 4) times:
-        set {_offsetY} to {_d} - loop-iteration * 4
-        set {_dx} to 50 * 0.95 ^ (loop-iteration)
-        make 100 of dust using dustOption(light purple, 3) at ({_loc} ~ vector({_offsetY} * 0.2, {_offsetY}, {_offsetY} * 0.2)) with offset vector({_dx},{_dx},{_dx}) with force
-        make 100 of dust using dustOption(light blue, 3) at ({_loc} ~ vector({_offsetY} * (-0.2), {_offsetY}, {_offsetY} * 0.2)) with offset vector({_dx},{_dx},{_dx}) with force
-        make 100 of dust using dustOption(lime, 3) at ({_loc} ~ vector({_offsetY} * 0.2, {_offsetY}, {_offsetY} * (-0.2))) with offset vector({_dx},{_dx},{_dx}) with force
-        make 100 of dust using dustOption(yellow, 3) at ({_loc} ~ vector({_offsetY} * (-0.2), {_offsetY}, {_offsetY} * (-0.2))) with offset vector({_dx},{_dx},{_dx}) with force
+    loop ({_d}) times:
+        set {_offsetY} to {_d} - loop-iteration
+        set {_dx} to 2
+        make 100 of dust using dustOption(light purple, 3) at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector({_dx},{_dx},{_dx}) with force
+        make 100 of dust using dustOption(light blue, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos({_d} - loop-iteration), {_offsetY}, {_offsetY} * 0.2 * sin({_d} - loop-iteration))) with offset vector({_dx},{_dx},{_dx}) with force
+        make 100 of dust using dustOption(lime, 3) at ({_loc} ~ vector({_offsetY} * 0.2 * cos({_d} - loop-iteration), {_offsetY}, {_offsetY} * (-0.2) * sin({_d} - loop-iteration))) with offset vector({_dx},{_dx},{_dx}) with force
+        make 100 of dust using dustOption(yellow, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector({_dx},{_dx},{_dx}) with force
         make 100 of dust using dustOption(red, 3) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector({_dx},{_dx},{_dx}) with force
         wait 1 tick
     make 100 of flash at {_p} with offset vector(1,1,1) with force
