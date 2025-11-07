@@ -109,15 +109,16 @@ local function Eliminate(p: player, msg: string = "none"):
     set {_loc} to location of {_p}
     set {_d} to 400 - altitude of {_loc} 
     set {Elim::%{_p}%} to true
-    loop ({_d}) times:
-        set {_offsetY} to {_d} - loop-iteration
-        set {_dx} to 2
-        make 100 of dust using dustOption(light purple, 3) at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector({_dx},{_dx},{_dx}) with force
-        make 100 of dust using dustOption(light blue, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos({_d} - loop-iteration), {_offsetY}, {_offsetY} * 0.2 * sin({_d} - loop-iteration))) with offset vector({_dx},{_dx},{_dx}) with force
-        make 100 of dust using dustOption(lime, 3) at ({_loc} ~ vector({_offsetY} * 0.2 * cos({_d} - loop-iteration), {_offsetY}, {_offsetY} * (-0.2) * sin({_d} - loop-iteration))) with offset vector({_dx},{_dx},{_dx}) with force
-        make 100 of dust using dustOption(yellow, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector({_dx},{_dx},{_dx}) with force
-        make 100 of dust using dustOption(red, 3) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector({_dx},{_dx},{_dx}) with force
+    loop ({_d} / 2) times:
+        set {_offsetY} to {_d} - loop-iteration * 2
+        set {_dx} to 2 - loop-iteration * 3 / {_d}
+        make 200 of dust using dustOption(light purple, 3) at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector({_dx},{_dx},{_dx}) with force
+        make 200 of dust using dustOption(light blue, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos({_d} - loop-iteration), {_offsetY}, {_offsetY} * 0.2 * sin({_d} - loop-iteration))) with offset vector({_dx},{_dx},{_dx}) with force
+        make 200 of dust using dustOption(lime, 3) at ({_loc} ~ vector({_offsetY} * 0.2 * cos({_d} - loop-iteration), {_offsetY}, {_offsetY} * (-0.2) * sin({_d} - loop-iteration))) with offset vector({_dx},{_dx},{_dx}) with force
+        make 200 of dust using dustOption(yellow, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector({_dx},{_dx},{_dx}) with force
+        make 200 of dust using dustOption(red, 3) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector({_dx},{_dx},{_dx}) with force
         wait 1 tick
+    broadcast {_dx}
     make 100 of flash at {_p} with offset vector(1,1,1) with force
     strike lightning effect at {_p}
     drop items in inventory of {_p} at {_p}
@@ -145,16 +146,3 @@ command /testanimation:
     trigger:
         Eliminate(player)
 
-
-local function circle(center: location, r: number, color: color = (dark purple)):
-    loop 361 times:
-        set {_x} to {_r} * cos(loop-iteration - 1)
-        set {_z} to {_r} * sin(loop-iteration - 1)
-        set {_loc} to {_center} offset by vector({_x}, 0, {_z})
-        make 5 of dust using dustOption({_color}, 1) at {_loc} with delta vector(0, 0, 0) with force
-        wait 1 tick
-command /circle:
-    description: description
-    permission: permission
-    trigger:
-        circle(location of player, 5, blue)
