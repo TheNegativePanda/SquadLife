@@ -119,13 +119,13 @@ local function Eliminate(p: player, msg: string = "none"):
         make 200 of dust using dustOption(yellow, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector({_dx},{_dx},{_dx}) with force
         make 200 of dust using dustOption(red, 3) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector({_dx},{_dx},{_dx}) with force
         wait 1 tick
-    broadcast {_dx}
     make 100 of flash at {_p} with offset vector(1,1,1) with force
     strike lightning effect at {_p}
     drop items in inventory of {_p} at {_p}
     play sound "entity.allay.death" to all players
     send title "&c&l%{_p}%" with subtitle "&f&lhas been eliminated!" to all players where [input != {_p}]
     send title "&c&lYou have ran out of lives!" to {_p}
+    broadcast {_msg} if {_msg} != "none"
     delete {Elim::%{_p}%}
     kill {_p}
     set game mode of {_p} to spectator
