@@ -111,7 +111,8 @@ local function Eliminate(p: player, msg: string = "none"):
     set {Elim::%{_p}%} to true
     loop ({_d} / 2) times:
         set {_offsetY} to {_d} - loop-iteration * 2
-        set {_dx} to 2 - loop-iteration * 3 / {_d}
+        set {_dx} to 3 - {_offsetY} / 5
+        set {_dx} to 0.5 if {_dx} <= 0.5
         make 200 of dust using dustOption(light purple, 3) at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector({_dx},{_dx},{_dx}) with force
         make 200 of dust using dustOption(light blue, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos({_d} - loop-iteration), {_offsetY}, {_offsetY} * 0.2 * sin({_d} - loop-iteration))) with offset vector({_dx},{_dx},{_dx}) with force
         make 200 of dust using dustOption(lime, 3) at ({_loc} ~ vector({_offsetY} * 0.2 * cos({_d} - loop-iteration), {_offsetY}, {_offsetY} * (-0.2) * sin({_d} - loop-iteration))) with offset vector({_dx},{_dx},{_dx}) with force
