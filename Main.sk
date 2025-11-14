@@ -104,6 +104,14 @@ on death of player:
             wait 1 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
        
+local function EditGroups(p: players):
+    set {_gui} to a chest inventory with 7 rows named "&a&l%{_p::1}%'s soulbounds"
+    set slots (integers between 0 and 62) to gray stained glass pane named ""
+    set slot 
+
+
+
+
 local function Eliminate(p: player, msg: string = "none"):
     make 100 of dust using dustOption(red, 1.5) at {_p} with offset vector(1,1,1) with force
     set {_loc} to location of {_p}
