@@ -3,7 +3,7 @@ command /testselect:
         Start(all players)
 
 command /tesltsplit:
-    description: description
+    description: description 
     permission: permission
     trigger:
         SplitGroup({SquadLife::Data::%sender's uuid%::Soulbounds::*} and uuid of sender)
