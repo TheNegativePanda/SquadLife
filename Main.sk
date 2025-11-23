@@ -66,7 +66,7 @@ on join:
         add player to team named "%player%"
         UpdateTeam(player)
     player is alive
-    loop players from {SquadLife::Data::%player's uuid%}:
+    loop players from {SquadLife::Data::%player's uuid%::Soulbounds::*}:
         if all: 
             loop-value is online
             loop-value is alive
@@ -74,7 +74,7 @@ on join:
             set health of player to health of loop-value
 
 on respawn:
-    loop players from {SquadLife::Data::%player's uuid%}:
+    loop players from {SquadLife::Data::%player's uuid%::Soulbounds::*}:
         if loop-value is alive:
             set health of player to health of loop-value
 
@@ -132,10 +132,24 @@ on death of player:
             wait 1 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
        
-local function EditGroups(p: players):
-    set {_gui} to a chest inventory with 7 rows named "&a&l%{_p::1}%'s soulbounds"
+local function EditGroups(p: player, viewer: player):
+
+    set {_p::*} to {_p} and players from {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*}
+    set {_gui} to a chest inventory with 6 rows named "&a&l%{_p::1}%'s soulbounds"
     set slots (integers between 0 and 62) of {_gui} to gray stained glass pane named ""
-    set slot 56 of {_gui} to {_p::1}'s skull
+    set slots (17, 26, 35 and 44) of {_gui} to lime stained glass pane named ""
+    set slot 17 of {_gui} to {_p::1}'s skull named "%{_p::1}%" 
+    loop {_p::*} where [input != {_p::1}]:
+        set slot (17 + loop-iteration * 9) of {_gui} to loop-value's skull named "%loop-value%"
+    open {_gui} for {_viewer}
+
+command /teg:
+    description: description
+    permission: permission
+    trigger:
+        
+        EditGroups(player, player)
+
 
 
 
