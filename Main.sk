@@ -132,23 +132,14 @@ on death of player:
             wait 1 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
        
-local function EditGroups(p: player, viewer: player):
 
-    set {_p::*} to {_p} and players from {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*}
-    set {_gui} to a chest inventory with 6 rows named "&a&l%{_p::1}%'s soulbounds"
-    set slots (integers between 0 and 62) of {_gui} to gray stained glass pane named ""
-    set slots (17, 26, 35 and 44) of {_gui} to lime stained glass pane named ""
-    set slot 17 of {_gui} to {_p::1}'s skull named "%{_p::1}%" 
-    loop {_p::*} where [input != {_p::1}]:
-        set slot (17 + loop-iteration * 9) of {_gui} to loop-value's skull named "%loop-value%"
-    open {_gui} for {_viewer}
-
-command /teg:
-    description: description
-    permission: permission
-    trigger:
         
-        EditGroups(player, player)
+
+    
+
+
+
+
 
 
 
@@ -171,11 +162,22 @@ local function Eliminate(p: player, msg: string = "none"):
         else if {_offsetY} <= 0:
             set {_dx} to 0.5
         
-        make 200 of dust using dustOption(light purple, 3) at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector({_dx},1,{_dx}) with force
-        make 200 of dust using dustOption(light blue, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos({_d} - loop-iteration), {_offsetY}, {_offsetY} * 0.2 * sin({_d} - loop-iteration))) with offset vector({_dx},1,{_dx}) with force
-        make 200 of dust using dustOption(lime, 3) at ({_loc} ~ vector({_offsetY} * 0.2 * cos({_d} - loop-iteration), {_offsetY}, {_offsetY} * (-0.2) * sin({_d} - loop-iteration))) with offset vector({_dx},1,{_dx}) with force
-        make 200 of dust using dustOption(yellow, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector({_dx},1,{_dx}) with force
-        make 200 of dust using dustOption(red, 3) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector({_dx},1,{_dx}) with force
+        make 140 of dust using dustOption(light purple, 3) at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
+        make 140 of dust using dustOption(light blue, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * sin(loop-iteration -1), {_offsetY}, {_offsetY} * 0.2 * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
+        make 140 of dust using dustOption(lime, 3) at ({_loc} ~ vector({_offsetY} * 0.2 * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
+        make 140 of dust using dustOption(yellow, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
+        make 140 of dust using dustOption(red, 3) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector({_dx},1,{_dx}) with force
+        make 140 glow at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
+        make 140 glow at ({_loc} ~ vector({_offsetY} * (-0.2) * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * 0.2 * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
+        make 140 glow at ({_loc} ~ vector({_offsetY} * 0.2 * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
+        make 140 glow at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
+        make 140 glow at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector(1,1,1) with force
+        # make 200 sculk_soul at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
+        # make 200 sculk_soul at ({_loc} ~ vector({_offsetY} * (-0.2) * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * 0.2 * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
+        # make 200 sculk_soul at ({_loc} ~ vector({_offsetY} * 0.2 * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
+        # make 200 sculk_soul at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
+        # make 200 sculk_soul at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector(1,1,1) with force
+        
         wait 1 tick
     make 100 of flash at {_p} with offset vector(1,1,1) with force
     strike lightning effect at {_p}
