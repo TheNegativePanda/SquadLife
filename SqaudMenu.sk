@@ -1,19 +1,29 @@
-local function EditGroups(p: player, viewer: player):
+options:
+    players: Kibiyo, PexterPro, CoralWays, PikachuL0v3r, NoTouchGrass_, MuscleKrabby, TheNegativePanda, 80w_, Skyoeo, oJed_, FlyingDog7, ScriptoTheCode, JamezPaw, XG_GAMER, IM_GEORGE_WAHHH, Clownpierce, ParrotX2, Nufuli, Kippei123, SylveonEnjoyer, H2P224, Qibli777, Cherry_BOOM, Eken_ELon, SvenskFlagga, OscaThu
+
+local function EditGroups(p: player, viewer: player, page: integer = 1):
     set {_p::*} to {_p} and offline players from {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*}
     set {_gui} to a chest inventory with 6 rows named "&a&l%{_p::1}%'s soulbounds"
     set slots (integers between 0 and 62) of {_gui} to gray stained glass pane named ""
     set slots (17, 26, 35 and 44) of {_gui} to lime stained glass pane named ""
     set slot 17 of {_gui} to {_p::1}'s skull named "%{_p::1}%"
-    set {_players::*} to all players where [{SquadLife::Data::%input's uuid%::Soulbounds::*} does not exist] except {_p::1}
+    set {_split::*} to ("{@players}" split at ", ")
+    loop {_split::*}:
+        add loop-value parsed as offline player to {_players::*}
+    set {_players::*} to {_players::*} where [{SquadLife::Data::%input's uuid%::Soulbounds::*} does not exist] except {_p::1}  #all players where [{SquadLife::Data::%input's uuid%::Soulbounds::*} does not exist] except {_p::1}
+  
     loop 4 times:
         set slots (integers between (1 + 9 * loop-iteration) and (6 + 9 * loop-iteration)) of {_gui} to red stained glass pane named ""
-        loop 5 times:
-            set {_i} to (loop-iteration-2) + (5 * loop-iteration-1) - 5
+        loop 6 times:
+            set {_i} to (loop-iteration-2) + (6 * loop-iteration-1) - 6 + (24 * {_page}) - 24
             if {_players::%{_i}%} is set:
                 set {_item} to {_players::%{_i}%}'s skull named "&r%{_players::%{_i}%}%" with custom nbt from "{holder:%{_p::1}%}"
                 set slot ((1 + 9 * loop-iteration-1) + (loop-iteration-2) - 1) of {_gui} to {_item} 
   
-
+    if size of {_players::*} > (24 * {_page}) :
+        set slot 52 of {_gui} to arrow named "&cPage %{_page} + 1%" with custom nbt from "{holder:%{_p::1}%}"
+    if {_page} >= 2:
+        set slot 45 of {_gui} to arrow named "&cPage %{_page} - 1%" with custom nbt from "{holder:%{_p::1}%}"
     loop {_p::*} where [input != {_p::1}]:
         set slot (17 + loop-iteration * 9) of {_gui} to loop-value's skull named "&r%loop-value%" with custom nbt from "{holder:%{_p::1}%}"
     open {_gui} for {_viewer}
@@ -43,12 +53,12 @@ on inventory click:
         if size of {SquadLife::Data::%{_holder}'s uuid%::Soulbounds::*} = 3:
             send "&c%{_holder}% already has a full squad"
             stop
-        loop {SquadLife::Data::%{_holder}'s uuid%::Soulbounds::*}:
+        loop {SquadLife::Data::%{_player}'s uuid%::Soulbounds::*}:
             set {SquadLife::Data::%loop-value%::Soulbounds::%size of {SquadLife::Data::%loop-value%::Soulbounds::*} + 1%} to uuid of {_player}
-        set {SquadLife::Data::%{_holder}'s uuid%::Soulbounds::%size of {SquadLife::Data::%{_holder}'s uuid%::Soulbounds::*} + 1%} to uuid of {_player}
         loop {SquadLife::Data::%{_holder}'s uuid%::Soulbounds::*}:
             set {SquadLife::Data::%loop-value%::Soulbounds::%size of {SquadLife::Data::%loop-value%::Soulbounds::*} + 1%} to uuid of {_player}
             add loop-value to {SquadLife::Data::%{_player}'s uuid%::Soulbounds::*}
+        set {SquadLife::Data::%{_holder}'s uuid%::Soulbounds::%size of {SquadLife::Data::%{_holder}'s uuid%::Soulbounds::*} + 1%} to uuid of {_player}
         set {SquadLife::Data::%{_player}'s uuid%::Soulbounds::%size of {SquadLife::Data::%{_player}'s uuid%::Soulbounds::*} + 1%} to uuid of {_holder}  
         send "&aSuccesfully Linked %{_holder}% and %{_player}%" to player
         EditGroups({_holder}, player)
@@ -57,5 +67,4 @@ command /teg:
     description: description
     permission: permission
     trigger:
-        #set {SquadLife::Data::%player's uuid%::Soulbounds::*} to ("Kibiyo" parsed as offline player)'s uuid, ("CoralWays" parsed as offline player)'s uuid and "2662dc92-2619-4155-974d-f68b2451deca" parsed as uuid
-        EditGroups(player, player)
+        EditGroups(player, player, 2)
