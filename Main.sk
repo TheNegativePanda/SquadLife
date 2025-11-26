@@ -234,6 +234,7 @@ on tab complete of "/squadlife":
 command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
     description: description
     permission: permission
+    prefix: life
     trigger:
         if arg-1 = "modify":
             set {_p} to arg-3 parsed as player
@@ -266,7 +267,44 @@ command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
                         set {_p} to nearest player around player excluding player
                         ModifyLives({_p}, arg-4, {_lives})
                         send "&a%{_p}%'s lives have been modified. They now have %{SquadLife::Data::%{_p}'s uuid%::Lives}% Lives."
-                    
+            else if arg-2 = "soulbounds":
+                EditGroups({_p}, player)
+        else if arg-1 = "session":
+            if arg-2 = "start":
+                broadcast "&a&lThe Session has started!"
+                play sound "block.beacon.activate" to all players
+                set {SquadLife::Session} to true
+            else if arg-2 = "end":
+                broadcast "&c&lThe Session is over"
+                play sound "block.beacon.deactivate" to all players
+                set {SquadLife::Session} to false
+            else if arg-2 = "pause":
+                if {SquadLife::Session} = "paused" or false:
+                    broadcast "&a&lSession has been unpaused"
+                    set {SquadLife::Session} to true
+                    play sound "block.beacon.activate" to all players
+                else if {SquadLife::Session} = true:
+                    broadcast "&a&lSession has been paused"
+                    send "&aRun this command again the unpause it."
+                    set {SquadLife::Session} to "paused"
+                    play sound "block.beacon.deactivate" to all players
+        else if arg-1 = "reset":
+            if arg-2 = "confirm":
+                clear {SquadLife::*}
+                broadcast "&c&lThis Season's save data has been cleared by %sender%"
+                wait 5 seconds
+                set {_b} to mini message from "<green><click:run_command:'/life:squadlife start'>Click here to start a new season."
+                if sender is a player:
+                    send component {_b}
+                else:	
+                    send component {_b} to all operators
+            else:
+                send formatted "<red>You are about to delete all save data for this season."
+                wait 1 second
+                send component mini message from "<red>This action is <b>PERMANENT</b>!"
+                wait 1 second
+                send formatted "<red>Run <underline>/%command% reset confirm.<reset><red> To complete the reset." 
+
 
 local function ModifyLives(p: player, action: text, lives: integer):
     if {_action} = "set":
@@ -277,6 +315,7 @@ local function ModifyLives(p: player, action: text, lives: integer):
         add {_lives} to {SquadLife::Data::%{_p}'s uuid%::Lives}
     UpdateTeam({_p})           
                         
+local function ClearSeasonData():
 
 
     
