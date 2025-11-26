@@ -1,0 +1,12 @@
+# Applies to the entire squad
+
+function RollBoogeyman(p: players):
+    set {_color::*} to lime, yellow and light red
+    loop 3 times:
+        send title formatted "<%{_color::%loop-iteration%}%>%4 - loop-iteration%" to {_p::*}
+        play sound "ui.button.click" to {_p::*}
+        wait 2 seconds
+    send title "&eYou are..." to {_p::*}
+    play sound "entity.breeze.inhale" to {_p::*}
+    wait 2 second
+    set {_selected} to a random player out of {_p::*} 
