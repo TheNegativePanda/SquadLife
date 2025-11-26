@@ -23,12 +23,12 @@ local function SplitGroup(id: uuids):
             
             
 local function UpdateTeam(p: player):
-    set {_color::*} to light red, yellow, lime, light blue, light purple
+    set {_color::*} to light red, yellow, lime and green
     set team color of team of {_p} to {_color::%{SquadLife::Data::%{_p}'s uuid%::Lives}%}
     if {SquadLife::Data::%{_p}'s uuid%::Lives} <= 0:
         set team color of team of {_p} to gray
-    else if {SquadLife::Data::%{_p}'s uuid%::Lives} > 5:
-        set team color of team of {_p} to light purple
+    else if {SquadLife::Data::%{_p}'s uuid%::Lives} > 4:
+        set team color of team of {_p} to green
 
 local function Start(players: players = all players):
     loop 3 times:
@@ -102,7 +102,7 @@ on death of player:
         set death message to "&c%{-dm::%victim%}%"
         delete {-dm::%victim%}
     {SquadLife::Data::%victim's uuid%::Lives} > 0
-    if {SquadLife::Session} != true:
+    if {SquadLife::Session} = true:
         remove 1 from {SquadLife::Data::%victim's uuid%::Lives}
         loop players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}:
             if loop-value is not online:
@@ -120,6 +120,9 @@ on death of player:
             damage cause isn't custom
             {SquadLife::Data::%victim's uuid%::Lives} = 3 or 1
         then:
+            if {SquadLife::Roles::Boogeyman::*} contains uuid of victim:
+                remove ({SquadLife::Data::%attacker's uuid%::Soulbounds::*} and uuid of attacker) from {SquadLife::Roles::Boogeyman::*}
+                send "&aYou are no longer the Boogeyman" to victim and players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
             wait 2 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
        
@@ -315,7 +318,7 @@ local function ModifyLives(p: player, action: text, lives: integer):
         add {_lives} to {SquadLife::Data::%{_p}'s uuid%::Lives}
     UpdateTeam({_p})           
                         
-local function ClearSeasonData():
+
 
 
     
