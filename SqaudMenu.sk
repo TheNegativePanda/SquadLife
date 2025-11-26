@@ -10,8 +10,7 @@ function EditGroups(p: player, viewer: player, page: integer = 1):
     # set {_split::*} to ("{@players}" split at ", ")
     # loop {_split::*}:
     #     add loop-value parsed as offline player to {_players::*}
-    set {_players::*} to all players where [{SquadLife::Data::%input's uuid%::Soulbounds::*} does not exist] except {_p::1} #{_players::*} where [{SquadLife::Data::%input's uuid%::Soulbounds::*} does not exist] except {_p::1} 
-  
+    set {_players::*} to all players where [size of {SquadLife::Data::%input's uuid%::Soulbounds::*} + size of {_p::*} <= 4] except {_p::*} #{_players::*} where [{SquadLife::Data::%input's uuid%::Soulbounds::*} does not exist] except {_p::1} 
     loop 4 times:
         set slots (integers between (1 + 9 * loop-iteration) and (6 + 9 * loop-iteration)) of {_gui} to red stained glass pane named ""
         loop 6 times:
@@ -54,6 +53,7 @@ on inventory click:
             stop
         loop {SquadLife::Data::%{_player}'s uuid%::Soulbounds::*}:
             set {SquadLife::Data::%loop-value%::Soulbounds::%size of {SquadLife::Data::%loop-value%::Soulbounds::*} + 1%} to uuid of {_holder}
+            add loop-value to {SquadLife::Data::%{_holder}'s uuid%::Soulbounds::*}
         loop {SquadLife::Data::%{_holder}'s uuid%::Soulbounds::*}:
             set {SquadLife::Data::%loop-value%::Soulbounds::%size of {SquadLife::Data::%loop-value%::Soulbounds::*} + 1%} to uuid of {_player}
             add loop-value to {SquadLife::Data::%{_player}'s uuid%::Soulbounds::*}
