@@ -11,12 +11,12 @@ function RollBoogeyman(p: players, amount: integer):
     wait 2 second
     loop {_amount} times:
         set {_selected} to a random player out of {_p::*}
-        set {SquadLife::Roles::Boogeyman::*} to uuid of {_selected}
-        loop ((players from {SquadLife::Data::%uuid of {_selected}%::Soulbounds::*}) and {_selected}):
-            send title "&c&lThe Boogeyman" to loop-value
-            play sound "block.note_block.didgeridoo" to loop-value
-            send "&7You are &c&lThe Boogeyman&r&7. You or one of your soulbounds must kill another player before time runs out. If you &cfail &7everyone in your squad will be set down to their last life." to loop-value
-            remove loop-value from {_p::*} 
+        set {SquadLife::Roles::Boogeyman::%loop-iteration%} to uuid of {_selected}
+        loop {_selected} and ((players from {SquadLife::Data::%uuid of {_selected}%::Soulbounds::*})):
+            send title "&c&lThe Boogeyman" to loop-value-2
+            play sound "block.note_block.didgeridoo" to loop-value-2
+            send "&7You are &c&lThe Boogeyman&r&7. You or one of your soulbounds must kill another player before time runs out. If you &cfail &7everyone in your squad will be set down to their last life." to loop-value-2
+            remove loop-value-2 from {_p::*} 
     send title "&a&lNOT the Boogeyman" to {_p::*}
     play sound "block.note_block.bell" to {_p::*}
     
@@ -42,6 +42,7 @@ command /claimkill <player>:
     trigger:
         if metadata value "Claimable" of arg-1 = true:
             broadcast "&a%player% has claimed a kill on %arg-1%"
+            delete metadata value "Claimable" of arg-1
             if any: 
                 {SquadLife::Roles::Boogeyman::*} contains uuid of player
                 players from {SquadLife::Data::%uuid of player%::Soulbounds::*} contains any of {SquadLife::Roles::Boogeyman::*}
@@ -72,7 +73,7 @@ function FailBoogeymen():
     loop {_failed::*}:
         set {SquadLife::Data::%uuid of loop-value%::Lives} to 1
         if any of {SquadLife::Data::%uuid of loop-value%::Soulbounds::*} isn't online:
-            
+        # TODO:  
         UpdateTeam(loop-value)
     
             
