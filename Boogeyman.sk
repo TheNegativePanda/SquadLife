@@ -1,6 +1,6 @@
 # Applies to the entire squad
 
-function RollBoogeyman(p: players):
+function RollBoogeyman(p: players, amount: integer):
     set {_color::*} to lime, yellow and light red
     loop 3 times:
         send title formatted "<%{_color::%loop-iteration%}%>%4 - loop-iteration%" to {_p::*}
@@ -9,34 +9,70 @@ function RollBoogeyman(p: players):
     send title "&e&lYou are..." to {_p::*}
     play sound "entity.breeze.inhale" to {_p::*}
     wait 2 second
-    set {_selected} to a random player out of {_p::*}
-    set {SquadLife::Roles::Boogeyman::*} to uuid of {_selected}
-    loop ((players from {SquadLife::Data::%uuid of {_selected}%::Soulbounds::*}) and {_selected}):
-        send title "&c&lThe Boogeyman" to loop-value
-        play sound "block.note_block.didgeridoo" to loop-value
-        send "&7You are &c&lThe Boogeyman&r&7. You or one of your soulbounds must kill another player before time runs out. If you &cfail &7everyone in your squad will be set down to their last life." to loop-value
-        remove loop-value from {_p::*} 
+    loop {_amount} times:
+        set {_selected} to a random player out of {_p::*}
+        set {SquadLife::Roles::Boogeyman::*} to uuid of {_selected}
+        loop ((players from {SquadLife::Data::%uuid of {_selected}%::Soulbounds::*}) and {_selected}):
+            send title "&c&lThe Boogeyman" to loop-value
+            play sound "block.note_block.didgeridoo" to loop-value
+            send "&7You are &c&lThe Boogeyman&r&7. You or one of your soulbounds must kill another player before time runs out. If you &cfail &7everyone in your squad will be set down to their last life." to loop-value
+            remove loop-value from {_p::*} 
     send title "&a&lNOT the Boogeyman" to {_p::*}
     play sound "block.note_block.bell" to {_p::*}
     
 on death of player:
     {SquadLife::Session} = true
+    if all: 
+        attacker isn't a player
+        damage cause isn't custom
+    then:
+        set metadata value "Claimable" of victim to true 
+
     if any: 
         {SquadLife::Roles::Boogeyman::*} contains uuid of attacker
         players from {SquadLife::Data::%uuid of attacker%::Soulbounds::*} contains any of {SquadLife::Roles::Boogeyman::*}
     then:
-        send title "&a&lYou are cured" with subtitle "" to attacker and players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
-        play sound "block.note_block.bell" to players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
+        send title "&a&lYou are cured!" with subtitle "" to attacker and players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
+        play sound "block.note_block.bell" to attacker and players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
         remove ({SquadLife::Data::%attacker's uuid%::Soulbounds::*} and uuid of attacker) from {SquadLife::Roles::Boogeyman::*}
-    
-command /rollboogey:
-    description: description
-    permission: permission
-    trigger:
-        RollBoogeyman(all players)
+        send "&a%attacker% has killed %victim%. You are cured" to attacker and players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
 
-command /testchec arguments:
-    description: description
-    permission: permission
+command /claimkill <player>:
+    executable by: players
     trigger:
-        broadcast players from {SquadLife::Roles::Boogeyman::*}
+        if metadata value "Claimable" of arg-1 = true:
+            broadcast "&a%player% has claimed a kill on %arg-1%"
+            if any: 
+                {SquadLife::Roles::Boogeyman::*} contains uuid of player
+                players from {SquadLife::Data::%uuid of player%::Soulbounds::*} contains any of {SquadLife::Roles::Boogeyman::*}
+            then:
+                send title "&a&lYou are cured!" with subtitle "" to player and players from {SquadLife::Data::%player's uuid%::Soulbounds::*}
+                play sound "block.note_block.bell" to player and players from {SquadLife::Data::%player's uuid%::Soulbounds::*}
+                remove ({SquadLife::Data::%player's uuid%::Soulbounds::*} and uuid of player) from {SquadLife::Roles::Boogeyman::*}
+                send "&a%player% has claimed a kill on %arg-1%. You are cured" to player and players from {SquadLife::Data::%player's uuid%::Soulbounds::*}
+
+
+command /amitheboogeyman:
+    executable by: players 
+    trigger:
+        if any: 
+            {SquadLife::Roles::Boogeyman::*} contains uuid of player
+            players from {SquadLife::Data::%uuid of player%::Soulbounds::*} contains any of {SquadLife::Roles::Boogeyman::*}
+        then:
+            send "&7You are &c&lThe Boogeyman&r&7. You or one of your soulbounds must kill another player before time runs out. If you &cfail &7everyone in your squad will be set down to their last life."
+            play sound "block.note_block.didgeridoo" to player
+        else:
+            send "&7You are &a&lNOT the Boogeyman&r&7."
+            play sound "block.note_block.bell" to player
+        
+
+function FailBoogeymen():
+    set {_failed::*} to all players where [{SquadLife::Roles::Boogeyman::*} contains any of (uuid of input and players from {SquadLife::Data::%uuid of input%::Soulbounds::*})]
+    send title "&cYou have failed!" to {_failed::*}
+    loop {_failed::*}:
+        set {SquadLife::Data::%uuid of loop-value%::Lives} to 1
+        if any of {SquadLife::Data::%uuid of loop-value%::Soulbounds::*} isn't online:
+            
+        UpdateTeam(loop-value)
+    
+            

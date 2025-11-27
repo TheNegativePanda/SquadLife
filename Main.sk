@@ -111,21 +111,25 @@ on death of player:
                 if {SquadLife::Data::%loop-value's uuid%::Lives} = 0:
                     broadcast "&c%loop-value% has been eliminated!"
                     set game mode of loop-value to spectator
-        UpdateTeam(victim)
         if {SquadLife::Data::%victim's uuid%::Lives} = 0:
             cancel event
             Eliminate(victim)
             set {-dm::%victim%} to uncolored death message
+            stop
+        UpdateTeam(victim)
         if all:
             damage cause isn't custom
             {SquadLife::Data::%victim's uuid%::Lives} = 3 or 1
         then:
-            if {SquadLife::Roles::Boogeyman::*} contains uuid of victim:
-                remove ({SquadLife::Data::%attacker's uuid%::Soulbounds::*} and uuid of attacker) from {SquadLife::Roles::Boogeyman::*}
-                send "&aYou are no longer the Boogeyman" to victim and players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
+            if any: 
+                {SquadLife::Roles::Boogeyman::*} contains uuid of victim
+                {SquadLife::Roles::Boogeyman::*} contains any of {SquadLife::Data::%uuid of victim%::Soulbounds::*}
+            then:
+                remove ({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim) from {SquadLife::Roles::Boogeyman::*} 
+                send "&aYou are no longer the boogeyman." to victim and players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}
             wait 2 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
-       
+            
 
 local function Eliminate(p: player, msg: string = "none"):
     make 100 of dust using dustOption(red, 1.5) at {_p} with offset vector(1,1,1) with force
@@ -220,15 +224,18 @@ command /animation:
 
 
 on tab complete of "/squadlife":
-    set tab completions for position 1 to "modify", "session" and "reset"
+    set tab completions for position 1 to "modify", "boogeyman", "session" and "reset"
     if tab arg-1 = "modify":
         set tab completions for position 2 to "lives", "soulbounds" and "eliminate"
         set tab completions for position 3 to "@a", "@s", "@r", "@p" if tab arg-2 != "soulbounds"
         add all players to tab completions for position 3
         if tab arg-2 = "lives":
             set tab completions for position 4 to "set", "remove" and "add"
+    else if tab arg-1 = "boogeyman":
+        set tab completions for position 2 to "roll", "cure", "curse" and "fail"
+        set tab completions for position 3 to "@a", "@s", "@r", "@p" and all players where [{SquadLife::Data::%uuid of input%::Lives} > 0] if tab arg-2 = "cure" or "curse"
     set tab completions for position 2 to "start", "pause" and "end" if tab arg-1 = "session"
-        
+    
 
         
 
@@ -307,7 +314,18 @@ command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
                 send component mini message from "<red>This action is <b>PERMANENT</b>!"
                 wait 1 second
                 send formatted "<red>Run <underline>/%command% reset confirm.<reset><red> To complete the reset." 
-
+        else if arg-1 = "boogeyman": 
+            if arg-2 = "roll":
+                broadcast "&cThe boogeymen will be selected soon."
+                play sound "entity.lightning_bolt.thunder" to all players
+                wait 15 seconds
+                set {_players::*} to all players where [{SquadLife::Data::%uuid of input%::Lives} >= 2] except all players where [game mode of input != survival]
+                set {_i} to 1
+                set {_i} to arg-3 parsed as integer if arg-3 parsed as integer is set
+                RollBoogeyman({_players::*}, {_i})
+            else if arg-2 = "fail":
+                FailBoogeymen()
+            
 
 local function ModifyLives(p: player, action: text, lives: integer):
     if {_action} = "set":
