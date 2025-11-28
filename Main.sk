@@ -248,36 +248,32 @@ command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
     trigger:
         if arg-1 = "modify":
             set {_p} to arg-3 parsed as player
-        
+            
             if arg-2 = "lives":
                 set {_lives} to arg-5 parsed as integer
                 {_lives} is set
                 if arg-4 != "set", "remove" or "add":
                     send "&c%arg-4% is not a valid argument." 
-                else if {_p} is set:
-                    ModifyLives({_p}, arg-4, {_lives})
-                    send "&a%{_p}%'s lives have been modified. They now have %{SquadLife::Data::%{_p}'s uuid%::Lives}% Lives."
-                    UpdateTeam({_p})
-                else if arg-3 contains "@": 
-                    if arg-3 = "@a":    
+                
+                switch arg-3:
+                    case "@a":
                         loop all players:
                             ModifyLives(loop-player, arg-4, {_lives})
                         send "&aSet lives of all players to %{_lives}%" if arg-4 = "set"
                         send "&aRemoved %{_lives}% lives from all players" if arg-4 = "remove"
                         send "&aAdded %{_lives}% lives to all players" if arg-4 = "add"
-                    else if arg-3 = "@r":
+                    case "@s":
+                        set {_p} to player
+                    case "@r":
                         set {_p} to a random player out of all players
-                        ModifyLives({_p}, arg-4, {_lives})
-                        send "&a%{_p}%'s lives have been modified. They now have %{SquadLife::Data::%{_p}'s uuid%::Lives}% Lives."
-                    else if arg-3 = "@s":
-                        set {_p} to sender
-                        ModifyLives({_p}, arg-4, {_lives})
-                        send "&a%{_p}%'s lives have been modified. They now have %{SquadLife::Data::%{_p}'s uuid%::Lives}% Lives."
-                    else:
+                    case "@p":
                         set {_p} to nearest player around player excluding player
-                        ModifyLives({_p}, arg-4, {_lives})
-                        send "&a%{_p}%'s lives have been modified. They now have %{SquadLife::Data::%{_p}'s uuid%::Lives}% Lives."
+                    {_p} is set
+                    ModifyLives({_p}, arg-4, {_lives})
+                    send "&a%{_p}%'s lives have been modified. They now have %{SquadLife::Data::%{_p}'s uuid%::Lives}% Lives."
+                    UpdateTeam({_p})
             else if arg-2 = "soulbounds":
+                {_p} is set
                 EditGroups({_p}, player)
         else if arg-1 = "session":
             if arg-2 = "start":
