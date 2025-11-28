@@ -1,0 +1,8 @@
+on inventory slot change:
+    event-item != 0 airs
+    if player's metadata value "slot=(%index of event-slot%)" isn't set:
+        set player's metadata value "slot=(%index of event-slot%)" to now
+    if time since player's metadata value "slot=(%index of event-slot%)" >= 5 ticks:
+        set player's metadata value "slot=(%index of event-slot%)" to now
+        
+        
