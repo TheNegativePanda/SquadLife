@@ -69,12 +69,3 @@ on inventory click:
         else if index of event-slot = 52:
             EditGroups({_holder}, player, {_page})
             
-            
-
-        
-
-command /teg:
-    description: description
-    permission: permission
-    trigger:
-        EditGroups(player, player, 1)

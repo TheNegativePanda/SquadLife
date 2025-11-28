@@ -32,9 +32,7 @@ on death of player:
         {SquadLife::Roles::Boogeyman::*} contains uuid of attacker
         players from {SquadLife::Data::%uuid of attacker%::Soulbounds::*} contains any of {SquadLife::Roles::Boogeyman::*}
     then:
-        send title "&a&lYou are cured!" with subtitle "" to attacker and players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
-        play sound "block.note_block.bell" to attacker and players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
-        remove ({SquadLife::Data::%attacker's uuid%::Soulbounds::*} and uuid of attacker) from {SquadLife::Roles::Boogeyman::*}
+        CureBoogeyman(attacker)
         send "&a%attacker% has killed %victim%. You are cured" to attacker and players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
 
 command /claimkill <player>:
@@ -47,9 +45,7 @@ command /claimkill <player>:
                 {SquadLife::Roles::Boogeyman::*} contains uuid of player
                 players from {SquadLife::Data::%uuid of player%::Soulbounds::*} contains any of {SquadLife::Roles::Boogeyman::*}
             then:
-                send title "&a&lYou are cured!" with subtitle "" to player and players from {SquadLife::Data::%player's uuid%::Soulbounds::*}
-                play sound "block.note_block.bell" to player and players from {SquadLife::Data::%player's uuid%::Soulbounds::*}
-                remove ({SquadLife::Data::%player's uuid%::Soulbounds::*} and uuid of player) from {SquadLife::Roles::Boogeyman::*}
+                CureBoogeyman(player)
                 send "&a%player% has claimed a kill on %arg-1%. You are cured" to player and players from {SquadLife::Data::%player's uuid%::Soulbounds::*}
 
 
@@ -67,13 +63,22 @@ command /amitheboogeyman:
             play sound "block.note_block.bell" to player
         
 
+function CureBoogeyman(p: player):
+    send title "&a&lYou are cured!" with subtitle "" to {_p} and players from {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*}
+    play sound "block.note_block.bell" to {_p} and players from {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*}
+    remove ({SquadLife::Data::%{_p}'s uuid%::Soulbounds::*} and uuid of {_p}) from {SquadLife::Roles::Boogeyman::*}
+    
+
 function FailBoogeymen():
     set {_failed::*} to all players where [{SquadLife::Roles::Boogeyman::*} contains any of (uuid of input and players from {SquadLife::Data::%uuid of input%::Soulbounds::*})]
     send title "&cYou have failed!" to {_failed::*}
     loop {_failed::*}:
         set {SquadLife::Data::%uuid of loop-value%::Lives} to 1
-        if any of {SquadLife::Data::%uuid of loop-value%::Soulbounds::*} isn't online:
-        # TODO:  
+        loop {SquadLife::Data::%uuid of loop-value%::Soulbounds::*}:
+            player from loop-value-2 isn't set
+            set {SquadLife::Data::%loop-value-2%::Lives} to 1
+            UpdateTeam(offline player from loop-value)
+
         UpdateTeam(loop-value)
     
             
