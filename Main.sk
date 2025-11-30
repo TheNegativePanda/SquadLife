@@ -22,7 +22,7 @@ local function SplitGroup(id: uuids):
             set {SquadLife::Data::%loop-value-2%::Soulbounds::*} to {_rp::*} where [input != loop-value-2]
             
             
-local function UpdateTeam(p: player):
+function UpdateTeam(p: player):
     set {_color::*} to light red, yellow, lime and green
     set team color of team of {_p} to {_color::%{SquadLife::Data::%{_p}'s uuid%::Lives}%}
     if {SquadLife::Data::%{_p}'s uuid%::Lives} <= 0:
@@ -268,10 +268,10 @@ command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
                         set {_p} to a random player out of all players
                     case "@p":
                         set {_p} to nearest player around player excluding player
-                    {_p} is set
-                    ModifyLives({_p}, arg-4, {_lives})
-                    send "&a%{_p}%'s lives have been modified. They now have %{SquadLife::Data::%{_p}'s uuid%::Lives}% Lives."
-                    UpdateTeam({_p})
+                {_p} is set
+                ModifyLives({_p}, arg-4, {_lives})
+                send "&a%{_p}%'s lives have been modified. They now have %{SquadLife::Data::%{_p}'s uuid%::Lives}% Lives."
+                UpdateTeam({_p})
             else if arg-2 = "soulbounds":
                 {_p} is set
                 EditGroups({_p}, player)
@@ -332,11 +332,12 @@ command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
                     case "@a":
                         send "&cEvery player is now a Boogeyman."
                         loop all players:
+                            set {_p} to loop-player
                             switch arg-2:
                                 case "cure":
-                                    CureBoogeyman(loop-player)
+                                    CureBoogeyman({_p})
                                 case "curse":
-                                    add uuid of loop-player to {SquadLife::Roles::Boogeyman::*}
+                                    add uuid of {_p} to {SquadLife::Roles::Boogeyman::*}
                     default:
                         set {_p} to arg-3 parsed as player
                 if {_p} is set:
