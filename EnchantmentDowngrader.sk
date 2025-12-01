@@ -1,8 +1,32 @@
+# on load:
+#     load yaml "plugins/EnchantmentDowngrader/config.yml" as "config"
+#     if yaml "config" is empty:
+#         LoadDefaultValues("config")            
+
+# local function LoadDefaultValues(yaml: string):
+#     set {_yaml} to yaml "%{_yaml}%"
+    
+
+
 on inventory slot change:
     event-item != 0 airs
     if player's metadata value "slot=(%index of event-slot%)" isn't set:
         set player's metadata value "slot=(%index of event-slot%)" to now
-    if time since player's metadata value "slot=(%index of event-slot%)" >= 5 ticks:
+    else if time since player's metadata value "slot=(%index of event-slot%)" >= 5 ticks:
         set player's metadata value "slot=(%index of event-slot%)" to now
-        
-        
+        if CorrectItem(event-item stack) != event-item stack:
+            wait 1 tick
+            set slot (index of event-slot) of player's inventory to CorrectItem(event-item stack)
+
+
+local function CorrectItem(item: item stack, maxLevel: integer = 2) :: item stack:
+    set {_enchantments::*} to enchantments of {_item} where [enchantment level of input >= {_maxLevel}]
+    set enchantment level of {_enchantments::*} to {_maxLevel}
+    disenchant {_item}
+    loop {_enchantments::*}:
+        enchant {_item} with loop-value
+    return {_item}
+
+
+    
+     
