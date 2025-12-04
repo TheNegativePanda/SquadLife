@@ -7,8 +7,8 @@
 - skript-yaml 1.7.2
 
 ### Includes
-- Main twist
-- Boogeyman Mechanic
+- Main twist - mostly finished. TODO: 
+- Boogeyman Mechanic - 
 - Squad modification
 - Enchatment Corrector
     - skript-yaml is only required for the EnchantmenDowngrader.sk script.

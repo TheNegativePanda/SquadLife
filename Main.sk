@@ -129,54 +129,14 @@ on death of player:
                 send "&aYou are no longer the boogeyman." to victim and players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}
             wait 2 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
-            
 
-local function Eliminate(p: player, msg: string = "none"):
-    make 100 of dust using dustOption(red, 1.5) at {_p} with offset vector(1,1,1) with force
-    set {_loc} to location of {_p}
-    set {_d} to 400 - altitude of {_loc} 
-    set {Elim::%{_p}%} to true
-    loop ({_d} / 2) times:
-        set {_offsetY} to ({_d} - loop-iteration * 2)
-        set {_dx} to 3 - {_d} / {_offsetY} 
-        if {_dx} < 0.5:
-            set {_dx} to 0.5
-        else if {_offsetY} <= 0:
-            set {_dx} to 0.5
-        
-        make 140 of dust using dustOption(light purple, 3) at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
-        make 140 of dust using dustOption(light blue, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * sin(loop-iteration -1), {_offsetY}, {_offsetY} * 0.2 * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
-        make 140 of dust using dustOption(lime, 3) at ({_loc} ~ vector({_offsetY} * 0.2 * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
-        make 140 of dust using dustOption(yellow, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
-        make 140 of dust using dustOption(red, 3) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector({_dx},1,{_dx}) with force
-        # make 70 glow at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
-        # make 70 glow at ({_loc} ~ vector({_offsetY} * (-0.2) * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * 0.2 * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
-        # make 70 glow at ({_loc} ~ vector({_offsetY} * 0.2 * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
-        # make 70 glow at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
-        # make 70 glow at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector(1,1,1) with force
-        # make 70 explosion at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
-        # make 70 explosion at ({_loc} ~ vector({_offsetY} * (-0.2) * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * 0.2 * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
-        # make 70 explosion at ({_loc} ~ vector({_offsetY} * 0.2 * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
-        # make 70 explosion at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
-        # make 70 explosion at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector(1,1,1) with force
-        
-        wait 1 tick
-    make 100 of flash at {_p} with offset vector(1,1,1) with force
-    # loop blocks in radius 5 around {_p}:
-    #     loop-block != air
-    #     chance of 70%:
-    #         set loop-block to sculk
-    #     else:
-    #         set loop-block to soul sand
-    strike lightning effect at {_p}
+local function Eliminate(p: player):
+    strike lightning effect at location of {_p}
     drop items in inventory of {_p} at {_p}
-    play sound "entity.allay.death" to all players
-    send title "&c&l%{_p}%" with subtitle "&f&lhas been eliminated!" to all players where [input != {_p}]
-    send title "&c&lYou have ran out of lives!" to {_p}
-    broadcast {_msg} if {_msg} != "none"
-    delete {Elim::%{_p}%}
-    kill {_p}
-    set game mode of {_p} to spectator
+    send title "&c%{_p}%" with subtitle "&fhas been eliminated!" to all players
+    send title "&cYou have run out of lives!" to {_p}
+    send "&4Better luck next time." to {_p}
+    play sound "entity.allay.death" to all players 
 
 on player move:
     if {Elim::%player%} is true:
@@ -189,38 +149,7 @@ on damage:
     then:
         cancel event
 
-command /animation:
-    description: description
-    permission: permission
-    trigger:
-        set {_p} to player
-        set {_loc} to location of {_p}
-        set {_d} to 400 - altitude of {_loc} 
-        loop ({_d} / 2) times:
-            set {_offsetY} to ({_d} - loop-iteration * 2)
-            set {_dx} to 3 - {_d} / {_offsetY} 
-            if {_dx} < 0.5:
-                set {_dx} to 0.5
-            else if {_offsetY} <= 0:
-                set {_dx} to 0.5
-            
-            # make 140 of dust using dustOption(light purple, 3) at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
-            # make 140 of dust using dustOption(light blue, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * sin(loop-iteration -1), {_offsetY}, {_offsetY} * 0.2 * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
-            # make 140 of dust using dustOption(lime, 3) at ({_loc} ~ vector({_offsetY} * 0.2 * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
-            # make 140 of dust using dustOption(yellow, 3) at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
-            # make 140 of dust using dustOption(red, 3) at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector({_dx},1,{_dx}) with force
-            # make 140 glow at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
-            # make 140 glow at ({_loc} ~ vector({_offsetY} * (-0.2) * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * 0.2 * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
-            # make 140 glow at ({_loc} ~ vector({_offsetY} * 0.2 * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * cos(loop-iteration - 1))) with offset vector(1,1,1) with force
-            # make 140 glow at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with force
-            # make 140 glow at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector(1,1,1) with force
-            make 140 tinted_leaves using light purple at ({_loc} ~ vector(({_offsetY} * 0.2) * cos(loop-iteration - 1), {_offsetY}, ({_offsetY} * 0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with extra 0.1 with force
-            make 140 tinted_leaves using light blue at ({_loc} ~ vector({_offsetY} * (-0.2) * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * 0.2 * cos(loop-iteration - 1))) with offset vector(1,1,1) with extra 0.1 with force
-            make 140 tinted_leaves using lime at ({_loc} ~ vector({_offsetY} * 0.2 * sin(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * cos(loop-iteration - 1))) with offset vector(1,1,1) with extra 0.1 with force
-            make 140 tinted_leaves using yellow at ({_loc} ~ vector({_offsetY} * (-0.2) * cos(loop-iteration - 1), {_offsetY}, {_offsetY} * (-0.2) * sin(loop-iteration - 1))) with offset vector(1,1,1) with extra 0.1 with force
-            make 140 tinted_leaves using red at ({_loc} ~ vector(0, {_offsetY}, 0)) with offset vector(1,1,1) with extra 0.1 with force
-            
-            wait 1 tick
+
 
 
 on tab complete of "/squadlife":
