@@ -1,12 +1,16 @@
-# on load:
-#     load yaml "plugins/EnchantmentDowngrader/config.yml" as "config"
-#     if yaml "config" is empty:
-#         LoadDefaultValues("config")            
+on load:
+    LoadYaml()
 
-# local function LoadDefaultValues(yaml: string):
-#     set {_yaml} to yaml "%{_yaml}%"
-    
+local function LoadYaml():
+    load yaml "plugins/EnchantmentDowngrader/config.yml" as "config"
+    if yaml "config" is empty:
+        LoadDefaultValues("config")            
 
+local function LoadDefaultValues(yaml: string):
+    set yaml value "default" from {_yaml} to 2
+    set yaml value "enchantments.efficiency" from {_yaml} to 3
+    set comments of yaml node "enchantments" from {_yaml} to "Format for overiding default max enchant value is %%name of enchantment%%: %%level of enchantment%%" and "setting the level to 0 disables the enchantment completely"
+    save yaml {_yaml}
 
 on inventory slot change:
     event-item != 0 airs
@@ -14,14 +18,13 @@ on inventory slot change:
         set player's metadata value "slot=(%index of event-slot%)" to now
     else if time since player's metadata value "slot=(%index of event-slot%)" >= 5 ticks:
         set player's metadata value "slot=(%index of event-slot%)" to now
-        if CorrectItem(event-item stack) != event-item stack:
+        LoadYaml()
+        if CorrectItem(event-item stack, yaml value "default" of "config") != event-item stack:
             wait 1 tick
-            set slot (index of event-slot) of player's inventory to CorrectItem(event-item stack)
+            set slot (index of event-slot) of player's inventory to CorrectItem(event-item stack, yaml value "default" of "config")
 
 
-local function CorrectItem(item: item stack, maxLevel: integer = 2) :: item stack:
-            
-#    set {_enchantments::*} to enchantments of {_item} where [enchantment level of input >= {_maxLevel}]
+local function CorrectItem(item: item stack, maxLevel: integer) :: item stack:
     set {_enchantments::*} to getModifiedEnchantments(enchantments of {_item}, {_maxLevel})
     set {_keepEnchantments::*} to enchantments of {_item} except {_enchantments::*}
     if {_enchantments::*} are not set:
@@ -29,13 +32,19 @@ local function CorrectItem(item: item stack, maxLevel: integer = 2) :: item stac
     disenchant {_item}
     enchant {_item} with {_keepEnchantments::*}
     loop {_enchantments::*}:
-        enchant {_item} with "%enchantment of loop-value% %{_maxLevel}%" parsed as enchantment type
+        enchant {_item} with loop-value
     return {_item}
     
-local function getModifiedEnchantments(e: enchantment types, maxLevel: integer = 2) :: enchantment types:
+local function getModifiedEnchantments(e: enchantment types, maxLevel: integer) :: enchantment types:
+    #save yaml "config"
+    LoadYaml()
     loop {_e::*}:
-        if enchantment level of loop-value > {@%enchantment of loop-value%}:
-            add "%enchantment of loop-value% {@%enchantment of loop-value%}" parsed as enchantment type to {_enchantments::*}
-        else if enchantment level of loop-value > {_maxLevel}:
-            add "%enchantment of loop-value% %{_maxLevel}%"
-     
+        if enchantment level of loop-value > yaml value "enchantments.%enchantment of loop-value%" from "config":
+            set {_level} to yaml value "enchantments.%enchantment of loop-value%" from "config"
+            add "%enchantment of loop-value% %{_level}%" parsed as enchantment type to {_enchantments::*}
+        else if all: 
+            enchantment level of loop-value > {_maxLevel}
+            yaml value "enchantments.%enchantment of loop-value%" from "config" is not set
+        then:
+            add "%enchantment of loop-value% %{_maxLevel}%" parsed as enchantment type to {_enchantments::*}
+    return {_enchantments::*}
