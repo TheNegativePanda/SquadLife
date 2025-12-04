@@ -1,16 +1,10 @@
-# options:
-#     players: Kibiyo, PexterPro, CoralWays, PikachuL0v3r, NoTouchGrass_, MuscleKrabby, TheNegativePanda, 8Ow_, Skyoeo, oJed_, FlyingDog7, ScriptoTheCode, JamezPaw, XG_GAMER, IM_GEORGE_WAHHH, Clownpierce, ParrotX2, Nufuli, Kippei123, SylveonEnjoyer, H2P224, Qibli777, Cherry_BOOM, Eken_ELon, SvenskFlagga, OscaThu, ChickenIsOnline, MoshiMocha, Stamsite, OlofSpelar, DunoSpelar, AmboSpelar, Coyers, ShadeIsntHere, BBrendon, LoGz, Cheese_Blast, Aninate, JDFGamer, Bendicion, ColinMaximoff
-
 function EditGroups(p: player, viewer: player, page: integer = 1):
     set {_p::*} to {_p} and offline players from {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*}
     set {_gui} to a chest inventory with 6 rows named "&a&l%{_p::1}%'s soulbounds"
     set slots (integers between 0 and 62) of {_gui} to gray stained glass pane named ""
     set slots (17, 26, 35 and 44) of {_gui} to lime stained glass pane named ""
     set slot 17 of {_gui} to {_p::1}'s skull named "%{_p::1}%"
-    # set {_split::*} to ("{@players}" split at ", ")
-    # loop {_split::*}:
-    #     add loop-value parsed as offline player to {_players::*}
-    set {_players::*} to all players where [size of {SquadLife::Data::%input's uuid%::Soulbounds::*} + size of {_p::*} <= 4] except {_p::*} #{_players::*} where [{SquadLife::Data::%input's uuid%::Soulbounds::*} does not exist] except {_p::1} 
+    set {_players::*} to all players where [size of {SquadLife::Data::%input's uuid%::Soulbounds::*} + size of {_p::*} <= 4] except {_p::*}
     loop 4 times:
         set slots (integers between (1 + 9 * loop-iteration) and (6 + 9 * loop-iteration)) of {_gui} to red stained glass pane named ""
         loop 6 times:

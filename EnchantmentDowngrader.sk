@@ -36,7 +36,6 @@ local function CorrectItem(item: item stack, maxLevel: integer) :: item stack:
     return {_item}
     
 local function getModifiedEnchantments(e: enchantment types, maxLevel: integer) :: enchantment types:
-    #save yaml "config"
     LoadYaml()
     loop {_e::*}:
         if enchantment level of loop-value > yaml value "enchantments.%enchantment of loop-value%" from "config":

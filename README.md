@@ -7,8 +7,8 @@
 - skript-yaml 1.7.2
 
 ### Includes
-- Main twist - mostly finished. TODO: 
-- Boogeyman Mechanic - 
-- Squad modification
-- Enchatment Corrector
+- Main twist - mostly finished. TODO: Playtesting, Custom Findal Death animation. (possibly change final death sound to match Rolled Life)
+- Boogeyman Mechanic - finished. TODO: Playtesting
+- Squad modification - finsihed. TODO: (Stress Testing) (Possibly modify some icons) 
+- Enchatment Corrector - W.I.P but still usable. TODO: Add functionality for alternate max values depending on item.
     - skript-yaml is only required for the EnchantmenDowngrader.sk script.
