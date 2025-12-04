@@ -20,7 +20,9 @@ on inventory slot change:
 
 
 local function CorrectItem(item: item stack, maxLevel: integer = 2) :: item stack:
-    set {_enchantments::*} to enchantments of {_item} where [enchantment level of input >= {_maxLevel}]
+            
+#    set {_enchantments::*} to enchantments of {_item} where [enchantment level of input >= {_maxLevel}]
+    set {_enchantments::*} to getModifiedEnchantments(enchantments of {_item}, {_maxLevel})
     set {_keepEnchantments::*} to enchantments of {_item} except {_enchantments::*}
     if {_enchantments::*} are not set:
         return {_item}
@@ -30,6 +32,10 @@ local function CorrectItem(item: item stack, maxLevel: integer = 2) :: item stac
         enchant {_item} with "%enchantment of loop-value% %{_maxLevel}%" parsed as enchantment type
     return {_item}
     
-
-    
+local function getModifiedEnchantments(e: enchantment types, maxLevel: integer = 2) :: enchantment types:
+    loop {_e::*}:
+        if enchantment level of loop-value > {@%enchantment of loop-value%}:
+            add "%enchantment of loop-value% {@%enchantment of loop-value%}" parsed as enchantment type to {_enchantments::*}
+        else if enchantment level of loop-value > {_maxLevel}:
+            add "%enchantment of loop-value% %{_maxLevel}%"
      
