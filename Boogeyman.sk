@@ -22,6 +22,8 @@ function RollBoogeyman(p: players, amount: integer):
     
 on death of player:
     {SquadLife::Session} = true
+    wait 1 tick
+    {SquadLife::Data::%uuid of victim%::Lives} >= 1
     if all: 
         attacker isn't a player
         damage cause isn't custom
