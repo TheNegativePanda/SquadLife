@@ -1,5 +1,5 @@
 # SQUAD LIFE
-## by Deluxe Life Coded by TheNegativePanda
+## by Deluxe Life
 
 ### Dependencies 
 - Skript 1.13.0
