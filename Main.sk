@@ -47,9 +47,6 @@ local function Start(players: players = all players):
     send title "&a&l???" to {_players::*}
     play sound "block.tinted_leaves using lime_block.bell" to {_players::*}
     damage {_players::*} by 0.1
-    # loop {_players::*}: 
-    #     send title "&a%players from {SquadLife::Data::%uuid of loop-value%::Soulbounds::*}%" to loop-value
-    #     play sound "block.tinted_leaves using lime_block.bell" to loop-value
 
 
 on join:
