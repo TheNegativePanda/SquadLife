@@ -7,7 +7,8 @@
 - skript-yaml 1.7.2
 
 ### Includes
-- Main twist - mostly finished. TODO: Playtesting, Custom Findal Death animation. (possibly change final death sound to match Rolled Life)
+- Main twist - mostly finished. 
+    - TODO: Playtesting, Custom Findal Death animation. (possibly change final death sound to match Rolled Life)
 - Boogeyman Mechanic - mostly finished. 
     - TODO: Playtesting and Fail warning.
 - Squad modification - finsihed. 
