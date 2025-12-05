@@ -8,8 +8,12 @@ local function LoadYaml():
 
 local function LoadDefaultValues(yaml: string):
     set yaml value "default" from {_yaml} to 2
+    set comments of yaml node "default" from {_yaml} to "The default maximum level for all enchantments"
     set yaml value "enchantments.efficiency" from {_yaml} to 3
     set comments of yaml node "enchantments" from {_yaml} to "Format for overiding default max enchant value is %%name of enchantment%%: %%level of enchantment%%" and "setting the level to 0 disables the enchantment completely"
+    set yaml value "overrides.override_global_values" to false
+    set yaml value "overrides.diamond_axe.sharpness" to 1
+    set comments of yaml node "overrides" to "Format for overiding the global enchantment cap is"
     save yaml {_yaml}
 
 on inventory slot change:
@@ -25,7 +29,7 @@ on inventory slot change:
 
 
 local function CorrectItem(item: item stack, maxLevel: integer) :: item stack:
-    set {_enchantments::*} to getModifiedEnchantments(enchantments of {_item}, {_maxLevel})
+    set {_enchantments::*} to getModifiedEnchantments({_item}, {_maxLevel})
     set {_keepEnchantments::*} to enchantments of {_item} except {_enchantments::*}
     if {_enchantments::*} are not set:
         return {_item}
@@ -35,10 +39,17 @@ local function CorrectItem(item: item stack, maxLevel: integer) :: item stack:
         enchant {_item} with loop-value
     return {_item}
     
-local function getModifiedEnchantments(e: enchantment types, maxLevel: integer) :: enchantment types:
+local function getModifiedEnchantments(item: item stack, maxLevel: integer) :: enchantment types:
     LoadYaml()
-    loop {_e::*}:
-        if enchantment level of loop-value > yaml value "enchantments.%enchantment of loop-value%" from "config":
+    loop enchantments of {_item}:
+        if enchantment level of loop-value > yaml value "overrides.%lower snake case "%type of {_item}%"%.%enchantment of loop-value%" from "config":
+            set {_level} to yaml value "overrides.%type of {_item}%.%enchantment of loop-value%" from "config"
+            add "%enchantment of loop-value% %{_level}%" parsed as enchantment type to {_enchantments::*}
+
+        else if all:
+            enchantment level of loop-value > yaml value "enchantments.%enchantment of loop-value%" from "config"
+            yaml value "overrides.%type of {_item}%.%enchantment of loop-value%" from "config" is not set
+        then:
             set {_level} to yaml value "enchantments.%enchantment of loop-value%" from "config"
             add "%enchantment of loop-value% %{_level}%" parsed as enchantment type to {_enchantments::*}
         else if all: 
