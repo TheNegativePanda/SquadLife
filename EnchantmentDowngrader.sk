@@ -42,14 +42,17 @@ local function CorrectItem(item: item stack, maxLevel: integer) :: item stack:
 local function getModifiedEnchantments(item: item stack, maxLevel: integer) :: enchantment types:
     LoadYaml()
     loop enchantments of {_item}:
-        if enchantment level of loop-value > yaml value "overrides.%lower snake case "%type of {_item}%"%.%enchantment of loop-value%" from "config":
-            set {_level} to yaml value "overrides.%type of {_item}%.%enchantment of loop-value%" from "config"
-            add "%enchantment of loop-value% %{_level}%" parsed as enchantment type to {_enchantments::*}
-
-        else if all:
-            enchantment level of loop-value > yaml value "enchantments.%enchantment of loop-value%" from "config"
-            yaml value "overrides.%type of {_item}%.%enchantment of loop-value%" from "config" is not set
+        if any:
+            yaml value "overrides.%lower snake case "%type of {_item}%"%.%enchantment of loop-value%" from "config" is set
+            yaml value "overrides.%lower snake case "%type of {_item}%"%.default" from "config" is set
         then:
+            if enchantment level of loop-value > yaml value "overrides.%lower snake case "%type of {_item}%"%.%enchantment of loop-value%" from "config":
+                set {_level} to yaml value "overrides.%lower snake case "%type of {_item}%"%.%enchantment of loop-value%" from "config"
+                add "%enchantment of loop-value% %{_level}%" parsed as enchantment type to {_enchantments::*}
+            else:
+                set {_level} to yaml value "overrides.%lower snake case "%type of {_item}%"%.%enchantment of loop-value%" from "config"
+                
+        else if enchantment level of loop-value > yaml value "enchantments.%enchantment of loop-value%" from "config":
             set {_level} to yaml value "enchantments.%enchantment of loop-value%" from "config"
             add "%enchantment of loop-value% %{_level}%" parsed as enchantment type to {_enchantments::*}
         else if all: 
