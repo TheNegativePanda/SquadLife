@@ -272,6 +272,9 @@ command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
                             CureBoogeyman({_p})
                         case "curse":
                             add uuid of {_p} to {SquadLife::Roles::Boogeyman::*}
+                            send "&7You are &c&lThe Boogeyman&r&7. You or one of your soulbounds must kill another player before time runs out. If you &cfail &7everyone in your squad will be set down to their last life." to {_p}
+                            play sound "block.note_block.didgeridoo" to {_p}
+                            send "&a%{_p}% has been added as a boogeyman."
                     
 
             
