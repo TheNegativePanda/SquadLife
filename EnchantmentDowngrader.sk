@@ -1,3 +1,6 @@
+# This script was coded by TheNegativePanda
+
+
 on load:
     LoadYaml()
 

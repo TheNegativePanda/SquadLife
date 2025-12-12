@@ -1,3 +1,6 @@
+# This script was coded by TheNegativePanda
+
+
 function EditGroups(p: player, viewer: player, page: integer = 1):
     set {_p::*} to {_p} and offline players from {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*}
     set {_gui} to a chest inventory with 6 rows named "&a&l%{_p::1}%'s soulbounds"

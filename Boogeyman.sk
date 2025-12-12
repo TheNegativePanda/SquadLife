@@ -1,4 +1,4 @@
-# Applies to the entire squad
+# This script was coded by TheNegativePanda
 
 function RollBoogeyman(p: players, amount: integer):
     set {_color::*} to lime, yellow and light red

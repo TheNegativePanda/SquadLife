@@ -1,4 +1,10 @@
 
+# This script was coded by TheNegativePanda
+
+
+
+
+
 local function SelectGroups(p: players = all players):
     clear {SquadLife::Data::*}
     loop ceil(size of {_p::*} / 4) times:
