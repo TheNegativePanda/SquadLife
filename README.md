@@ -15,4 +15,4 @@
     - TODO: (Stress Testing) (Possibly modify some icons) 
 - Enchatment Corrector - usable but not finished. 
     - TODO: Add functionality for alternate max values depending on item group, (e.g. override for all variants of an item). Work on config file.
-    - skript-yaml is only required for the EnchantmenDowngrader.sk script.
+    - skript-yaml is only required for the EnchantmentDowngrader.sk script.
