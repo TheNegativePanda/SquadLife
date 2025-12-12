@@ -129,14 +129,36 @@ on death of player:
 
 local function Eliminate(p: player):
     strike lightning effect at {_p}
+    make 140 of sculk_soul at {_p} with offset vector(1,1,1) with force
     make 140 of flash at {_p} with offset vector(1,1,1) with force
+    SculkArea(location of {_p}, 5)
     drop items in inventory of {_p} at {_p} if gamerule keepInventory of world of {_p} is true
     send title "&c%{_p}%" with subtitle "&fhas been eliminated!" to all players
     send title "&cYou have run out of lives!" to {_p}
     play sound "entity.allay.death" to all players 
     wait 1 tick
     send "&4Better luck next time." to {_p}
-    
+
+local function SculkArea(loc: location, radius: integer = 5, delay: timespan = 1 tick):
+    loop blocks in radius {_radius} of {_loc} where [type of input != air]:
+        set {_wait} to true if block at (location of loop-block ~ vector(0,1,0)) = air 
+        chance of 70%:
+            set loop-block to sculk
+            chance of 20%:
+                set block at (location of loop-block ~ vector(0,1,0)) to sculk sensor
+            else chance 20%:
+                set block at (location of loop-block ~ vector(0,1,0)) to sculk catalyst
+            else chance of 50%:
+                set block at (location of loop-block ~ vector(0,1,0)) to sculk vein 
+        else chance of 50%:
+            set block at (location of loop-block ~ vector(0,1,0)) to sculk vein
+        else:
+            set loop-block to soul sand
+        if {_wait} = true:
+            set {_wait} to false
+            wait {_delay}
+        
+
 
 on player move:
     if {Elim::%player%} is true:
