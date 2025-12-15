@@ -80,7 +80,8 @@ function FailBoogeymen():
             player from loop-value-2 isn't set
             set {SquadLife::Data::%loop-value-2%::Lives} to 1
             UpdateTeam(offline player from loop-value-2)
-
+            clear {SquadLife::Data::%loop-value-2%::Soulbounds::*}
+        clear {SquadLife::Data::%uuid of loop-value%::Soulbounds::*}
         UpdateTeam(loop-value)
     
             
