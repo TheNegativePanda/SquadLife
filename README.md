@@ -8,7 +8,7 @@
 
 ### Includes
 - Main twist - mostly finished. 
-    - TODO: Playtesting, (possibly Custom Final Death animation). (possibly change final death sound to match Rolled Life)
+    - TODO: Playtesting, (possibly Custom Final Death animation). 
 - Boogeyman Mechanic - mostly finished. 
     - TODO: Playtesting and Fail warning.
 - Squad modification - finsihed. 

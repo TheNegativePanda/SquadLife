@@ -1,10 +1,6 @@
 
 # This script was coded by TheNegativePanda
 
-
-
-
-
 local function SelectGroups(p: players = all players):
     clear {SquadLife::Data::*}
     loop ceil(size of {_p::*} / 4) times:
@@ -18,7 +14,7 @@ local function SelectGroups(p: players = all players):
 local function SplitGroup(id: uuids):
     loop {_id::*}:
         clear {SquadLife::Data::%loop-value%::Soulbounds::*}
-    set {_size} to size of {_id::*} 
+    set {_size} to size of {_id::*}
     loop 2 times:
         clear {_rp::*}
         loop ceil({_size} / 2) times:
@@ -26,7 +22,7 @@ local function SplitGroup(id: uuids):
             remove {_rp::%loop-iteration-2%} from {_id::*} 
         loop {_rp::*}:
             set {SquadLife::Data::%loop-value-2%::Soulbounds::*} to {_rp::*} where [input != loop-value-2]
-        
+            
             
 function UpdateTeam(p: player):
     set {_color::*} to light red, yellow, lime and green
@@ -132,24 +128,31 @@ on death of player:
                 send "&aYou are no longer the boogeyman." to victim and players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}
             wait 2 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
+        
 
 local function Eliminate(p: player):
     strike lightning effect at {_p}
-
-
+    make 300 of lava at {_p} with offset vector(1,2,1) with extra 0.1 with force
+    make 3000 of trial_omen at {_p} with offset vector(1,200,1) with extra 0.1 with force
+    loop 5 times:
+        make 300 of lava at {_p} with offset vector(1,2,1) with extra 0.1 with force
+        make 300 of heart at {_p} with offset vector(1,2,1) with extra 0.1 with force
+        wait 1 second
+    make 500 of totem_of_undying at {_p} with offset vector(1,1,1) with extra 0.1 with force
     SculkArea(location of {_p}, 5)
     drop items in inventory of {_p} at {_p} if gamerule keepInventory of world of {_p} is true
     send title "&c%{_p}%" with subtitle "&fhas been eliminated!" to all players
     send title "&cYou have run out of lives!" to {_p}
-    play sound "entity.allay.death" to all players 
+    play sound "entity.allay.death" at volume 0.75 with pitch 0.5 to all players 
     wait 1 tick
     send "&4Better luck next time." to {_p}
 
 
 
+
 local function SculkArea(loc: location, radius: integer = 5, delay: timespan = 1 tick):
     loop blocks in radius {_radius} of {_loc} where [type of input != air]:
-        chance of 70%:
+        chance of 90%:
             set loop-block to sculk
             if type of block at (location of loop-block ~ vector(0,1,0)) = air: 
                 chance of 5%:
