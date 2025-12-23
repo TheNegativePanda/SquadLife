@@ -98,12 +98,6 @@ on heal:
             set health of loop-value to health of player
 
 on death of player:
-    if all: 
-        {SquadLife::Data::%victim's uuid%::Lives} <= 0
-        {-dm::%victim%} is set
-    then:
-        set death message to "&c%{-dm::%victim%}%"
-        delete {-dm::%victim%}
     {SquadLife::Data::%victim's uuid%::Lives} > 0
     if {SquadLife::Session} = true:
         remove 1 from {SquadLife::Data::%victim's uuid%::Lives}
@@ -115,9 +109,8 @@ on death of player:
                 broadcast "&c%offline player from loop-value% has been eliminated!"
                 set game mode of offline player from loop-value to spectator
         if {SquadLife::Data::%victim's uuid%::Lives} = 0:
-            cancel event
             Eliminate(victim)
-            set {-dm::%victim%} to uncolored death message
+            set death message to "&c%uncolored death message%"
             stop
         UpdateTeam(victim)
         if all:
@@ -137,32 +130,44 @@ local function Eliminate(p: player):
     strike lightning effect at {_p}
     make 140 of sculk_soul at {_p} with offset vector(1,1,1) with force
     make 140 of flash at {_p} with offset vector(1,1,1) with force
-    SculkArea(location of {_p}, 5)
+    SculkArea(location of {_p}, 5, 0 ticks)
     drop items in inventory of {_p} at {_p} if gamerule keepInventory of world of {_p} is true
     send title "&c%{_p}%" with subtitle "&fhas been eliminated!" to all players
     send title "&cYou have run out of lives!" to {_p}
     play sound "entity.allay.death" to all players 
+    set game mode of {_p} to spectator
+    set team color of team of {_p} to gray
     wait 1 tick
     send "&4Better luck next time." to {_p}
 
+
+local function Animation(p: player):
+    set {Elim::%{_p}%} to true
+    strike lightning effect at {_p}
+    make 300 of lava at {_p} with offset vector(1,3,1) with extra 1 with force
+    make 3000 of trial_omen at {_p} with offset vector(0, 100, 0) with extra 1 with force
+    loop 10 times:
+        make 30 of heart at {_p} with offset vector(1, 2, 1) with extra 1 with force
+        wait 10 ticks
+    make 3000 of totem_of_undying at {_p} with offset vector(0, 3, 0) with extra 1 with force
+    strike lightning effect at {_p} 
+    play sound "entity.allay.ambient_without_item" with volume 0.75 at pitch 0.1 to all players 
+    play sound "item.mace.smash_ground_heavy" with volume 0.75 at pitch 0.1 to all players 
+    delete {Elim::%{_p}%}
+    kill {_p} 
+
 local function SculkArea(loc: location, radius: integer = 5, delay: timespan = 1 tick):
-    loop blocks in radius {_radius} of {_loc} where [type of input != air]:
-        set {_wait} to true if block at (location of loop-block ~ vector(0,1,0)) = air 
+    set {_blocks::*} to blocks in radius {_radius} of {_loc} where [type of input != air]
+    loop {_blocks::*}:
         chance of 70%:
-            set loop-block to sculk
+            set block at location of loop-value to sculk
             chance of 20%:
-                set block at (location of loop-block ~ vector(0,1,0)) to sculk sensor
-            else chance 20%:
-                set block at (location of loop-block ~ vector(0,1,0)) to sculk catalyst
-            else chance of 50%:
-                set block at (location of loop-block ~ vector(0,1,0)) to sculk vein 
-        else chance of 50%:
-            set block at (location of loop-block ~ vector(0,1,0)) to sculk vein
+                set block at (location of loop-value ~ vector(0,1,0)) to sculk sensor
+            else if chance of 20%:
+                set block at (location of loop-value ~ vector(0,1,0)) to sculk catalyst
         else:
-            set loop-block to soul sand
-        if {_wait} = true:
-            set {_wait} to false
-            wait {_delay}
+            set block at location of loop-value to soul sand
+
         
 
 
@@ -177,7 +182,11 @@ on damage:
     then:
         cancel event
 
-
+command /testanimatin arguments:
+    description: description
+    permission: permission
+    trigger:
+        Animation(player)
 
 
 on tab complete of "/squadlife":
@@ -306,8 +315,10 @@ command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
                             send "&7You are &c&lThe Boogeyman&r&7. You or one of your soulbounds must kill another player before time runs out. If you &cfail &7everyone in your squad will be set down to their last life." to {_p}
                             play sound "block.note_block.didgeridoo" to {_p}
                             send "&a%{_p}% has been added as a boogeyman."
-                    
+        else if arg-1 = "start":
+            Start(all players where [game mode of input = survival])
 
+                    
             
 
 local function ModifyLives(p: player, action: text, lives: integer):
