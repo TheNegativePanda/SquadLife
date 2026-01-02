@@ -75,6 +75,9 @@ on respawn:
 
 on damage of player:
     wait 1 tick
+    if victim's metadata "resurrected" is true:
+        show resurrection by totem at players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}
+        stop
     loop players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}:
         if all:
             victim isn't blocking
@@ -96,8 +99,11 @@ on heal:
         then:
             set health of loop-value to health of player
 
+
+
 on death of player:
     {SquadLife::Data::%victim's uuid%::Lives} > 0
+    set victim's metadata "hasDied" to true
     if {SquadLife::Session} = true:
         remove 1 from {SquadLife::Data::%victim's uuid%::Lives}
         loop {SquadLife::Data::%victim's uuid%::Soulbounds::*}:
@@ -120,10 +126,13 @@ on death of player:
                 {SquadLife::Roles::Boogeyman::*} contains uuid of victim
                 {SquadLife::Roles::Boogeyman::*} contains any of {SquadLife::Data::%uuid of victim%::Soulbounds::*}
             then:
-                remove ({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim) from {SquadLife::Roles::Boogeyman::*} 
+                set {_i} to first index of (any of (victim's uuid and {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*})) in {SquadLife::Roles::Boogeyman::*}
+                delete {SquadLife::Roles::Boogeyman::%{_i}%}
                 send "&aYou are no longer the boogeyman." to victim and players from {SquadLife::Data::%victim's uuid%::Soulbounds::*}
             wait 2 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
+    wait 2 ticks
+    delete victim's metadata "hasDied"
 
 local function Eliminate(p: player, deathMessage: string):
     strike lightning effect at {_p}
@@ -152,7 +161,22 @@ local function Eliminate(p: player, deathMessage: string):
     set team option death_message_visibility of team of {_p} to always
     send "&4Better luck next time." to {_p}
 
-
+on resurrect attempt:
+    set {_players::*} to players from {SquadLife::Data::%player's uuid%::Soulbounds::*} where [input's metadata "hasDied" is set]
+    if any: 
+        {SquadLife::Data::%player's uuid%::Lives} <= 0
+        size of {_players::*} >= 1
+    then:
+        cancel event
+        stop
+    if any:
+        player's offhand item = totem of undying
+        player's held item = totem of undying
+    then:
+        set player's metadata "resurrected" to true
+        wait 2 ticks
+        delete player's metadata "resurrected"
+        
 
 
 
