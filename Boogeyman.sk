@@ -32,7 +32,7 @@ on death of player:
 
     if any: 
         {SquadLife::Roles::Boogeyman::*} contains uuid of attacker
-        players from {SquadLife::Data::%uuid of attacker%::Soulbounds::*} contains any of {SquadLife::Roles::Boogeyman::*}
+        {SquadLife::Roles::Boogeyman::*} contains any of {SquadLife::Data::%uuid of attacker%::Soulbounds::*}
     then:
         CureBoogeyman(attacker)
         send "&a%attacker% has killed %victim%. You are cured" to attacker and players from {SquadLife::Data::%attacker's uuid%::Soulbounds::*}
@@ -68,7 +68,8 @@ command /amitheboogeyman:
 function CureBoogeyman(p: player):
     send title "&a&lYou are cured!" with subtitle "" to {_p} and players from {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*}
     play sound "block.note_block.bell" to {_p} and players from {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*}
-    remove ({SquadLife::Data::%{_p}'s uuid%::Soulbounds::*} and uuid of {_p}) from {SquadLife::Roles::Boogeyman::*}
+    set {_i} to first index of (any of ({_p}'s uuid and {SquadLife::Data::%{_p}'s uuid%::Soulbounds::*})) in {SquadLife::Roles::Boogeyman::*}
+    delete {SquadLife::Roles::Boogeyman::%{_i}%}
     
 
 function FailBoogeymen():
@@ -82,5 +83,6 @@ function FailBoogeymen():
             UpdateTeam(offline player from loop-value-2)
 
         UpdateTeam(loop-value)
+    clear {SquadLife::Roles::Boogeyman::*}
     
             

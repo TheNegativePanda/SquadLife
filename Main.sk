@@ -1,10 +1,6 @@
 
 # This script was coded by TheNegativePanda
 
-
-
-
-
 local function SelectGroups(p: players = all players):
     clear {SquadLife::Data::*}
     loop ceil(size of {_p::*} / 4) times:
@@ -53,6 +49,7 @@ local function Start(players: players = all players):
     send title "&a&l???" to {_players::*}
     play sound "block.tinted_leaves using lime_block.bell" to {_players::*}
     damage {_players::*} by 0.1
+    set {SquadLife::Session} to true
 
 
 on join:
@@ -71,6 +68,8 @@ on respawn:
     loop players from {SquadLife::Data::%player's uuid%::Soulbounds::*}:
         if loop-value is alive:
             set health of player to health of loop-value
+
+
 
 
 
@@ -109,8 +108,8 @@ on death of player:
                 broadcast "&c%offline player from loop-value% has been eliminated!"
                 set game mode of offline player from loop-value to spectator
         if {SquadLife::Data::%victim's uuid%::Lives} = 0:
-            Eliminate(victim)
-            set death message to "&c%uncolored death message%"
+            cancel event
+            Eliminate(victim, "&c%uncolored death message%")
             stop
         UpdateTeam(victim)
         if all:
@@ -126,49 +125,35 @@ on death of player:
             wait 2 tick
             SplitGroup({SquadLife::Data::%victim's uuid%::Soulbounds::*} and uuid of victim)
 
-local function Eliminate(p: player):
+local function Eliminate(p: player, deathMessage: string):
     strike lightning effect at {_p}
-    make 140 of sculk_soul at {_p} with offset vector(1,1,1) with force
-    make 140 of flash at {_p} with offset vector(1,1,1) with force
-    SculkArea(location of {_p}, 5, 0 ticks)
-    drop items in inventory of {_p} at {_p} if gamerule keepInventory of world of {_p} is true
-    send title "&c%{_p}%" with subtitle "&fhas been eliminated!" to all players
-    send title "&cYou have run out of lives!" to {_p}
-    play sound "entity.allay.death" to all players 
-    set game mode of {_p} to spectator
-    set team color of team of {_p} to gray
-    wait 1 tick
-    send "&4Better luck next time." to {_p}
-
-
-local function Animation(p: player):
     set {Elim::%{_p}%} to true
     strike lightning effect at {_p}
     make 300 of lava at {_p} with offset vector(1,3,1) with extra 1 with force
     make 3000 of trial_omen at {_p} with offset vector(0, 100, 0) with extra 1 with force
-    loop 10 times:
-        make 30 of heart at {_p} with offset vector(1, 2, 1) with extra 1 with force
-        wait 10 ticks
+    loop 5 times:
+        make 300 of lava at {_p} with offset vector(1,3,1) with extra 1 with force
+        wait 20 ticks
+        show resurrection by totem on {_p} if loop-iteration = 4
     make 3000 of totem_of_undying at {_p} with offset vector(0, 3, 0) with extra 1 with force
     strike lightning effect at {_p} 
     play sound "entity.allay.ambient_without_item" with volume 0.75 at pitch 0.1 to all players 
-    play sound "item.mace.smash_ground_heavy" with volume 0.75 at pitch 0.1 to all players 
+    play sound "item.mace.smash_ground_heavy" with volume 0.75 at pitch 0.1 to all players
     delete {Elim::%{_p}%}
-    kill {_p} 
+    set team option death_message_visibility of team of {_p} to never
+    kill {_p}
+    broadcast {_deathMessage}
+    drop items in inventory of {_p} at {_p} if gamerule keep_inventory of world of {_p} is true
+    send title "&c%{_p}%" with subtitle "&fhas been eliminated!" to all players
+    send title "&cYou have run out of lives!" to {_p} 
+    set game mode of {_p} to spectator
+    set team color of team of {_p} to gray
+    wait 1 tick
+    set team option death_message_visibility of team of {_p} to always
+    send "&4Better luck next time." to {_p}
 
-local function SculkArea(loc: location, radius: integer = 5, delay: timespan = 1 tick):
-    set {_blocks::*} to blocks in radius {_radius} of {_loc} where [type of input != air]
-    loop {_blocks::*}:
-        chance of 70%:
-            set block at location of loop-value to sculk
-            chance of 20%:
-                set block at (location of loop-value ~ vector(0,1,0)) to sculk sensor
-            else if chance of 20%:
-                set block at (location of loop-value ~ vector(0,1,0)) to sculk catalyst
-        else:
-            set block at location of loop-value to soul sand
 
-        
+
 
 
 on player move:
@@ -182,14 +167,7 @@ on damage:
     then:
         cancel event
 
-command /testanimatin arguments:
-    description: description
-    permission: permission
-    trigger:
-        Animation(player)
-
-
-on tab complete of "/squadlife":
+on tab complete of "/squadlife", "/life:squadlife":
     set tab completions for position 1 to "modify", "boogeyman", "session" and "reset"
     if tab arg-1 = "modify":
         set tab completions for position 2 to "lives", "soulbounds" and "eliminate"
@@ -319,7 +297,6 @@ command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
             Start(all players where [game mode of input = survival])
 
                     
-            
 
 local function ModifyLives(p: player, action: text, lives: integer):
     if {_action} = "set":
