@@ -1,8 +1,6 @@
 # This script was coded by TheNegativePanda
 
 
-on load:
-    LoadYaml()
 
 local function LoadYaml():
     load yaml "plugins/EnchantmentDowngrader/config.yml" as "config"
@@ -15,8 +13,12 @@ local function LoadDefaultValues(yaml: string):
     set yaml value "enchantments.efficiency" from {_yaml} to 3
     set comments of yaml node "enchantments" from {_yaml} to "Format for overiding default max enchant value is %%name of enchantment%%: %%level of enchantment%%" and "setting the level to 0 disables the enchantment completely"
     set yaml value "overrides.diamond_axe.sharpness" from {_yaml} to 1
-    set comments of yaml node "overrides" from {_yaml} to "Format for overiding the global enchantment cap is", "%%item type%%: ", "%%name of enchantment%%: %%level of enchantment%%"
+    set comments of yaml node "overrides" from {_yaml} to "Format for overiding the global enchantment cap is", "%%item type%%: " and "%%name of enchantment%%: %%level of enchantment%%"
     save yaml {_yaml}
+
+on load:
+    LoadYaml()
+
 
 on inventory slot change:
     event-item != 0 airs

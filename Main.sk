@@ -141,6 +141,8 @@ local function Eliminate(p: player, deathMessage: string):
     make 300 of lava at {_p} with offset vector(1,3,1) with extra 1 with force
     make 3000 of trial_omen at {_p} with offset vector(0, 100, 0) with extra 1 with force
     loop 5 times:
+        if {SquadLife::Data::%{_p}'s uuid%::Lives} >= 1:
+            stop
         make 300 of lava at {_p} with offset vector(1,3,1) with extra 1 with force
         wait 20 ticks
         show resurrection by totem on {_p} if loop-iteration = 4
@@ -153,8 +155,8 @@ local function Eliminate(p: player, deathMessage: string):
     kill {_p}
     broadcast {_deathMessage}
     drop items in inventory of {_p} at {_p} if gamerule keep_inventory of world of {_p} is true
-    send title "&c%{_p}%" with subtitle "&fhas been eliminated!" to all players
-    send title "&cYou have run out of lives!" to {_p} 
+    send title "&c%{_p}%" with subtitle "&7has been eliminated!" to all players
+    send title "&cYou have run out of lives!" with subtitle " " to {_p} 
     set game mode of {_p} to spectator
     set team color of team of {_p} to gray
     wait 1 tick
@@ -191,11 +193,11 @@ on damage:
     then:
         cancel event
 
-on tab complete of "/squadlife", "/life:squadlife":
+on tab complete of "/squadlife" or "/life:squadlife":
     set tab completions for position 1 to "modify", "boogeyman", "session" and "reset"
     if tab arg-1 = "modify":
         set tab completions for position 2 to "lives", "soulbounds" and "eliminate"
-        set tab completions for position 3 to "@a", "@s", "@r", "@p" if tab arg-2 != "soulbounds"
+        set tab completions for position 3 to "@a", "@s", "@r" and "@p" if tab arg-2 != "soulbounds"
         add all players to tab completions for position 3
         if tab arg-2 = "lives":
             set tab completions for position 4 to "set", "remove" and "add"
@@ -243,6 +245,9 @@ command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
             else if arg-2 = "soulbounds":
                 {_p} is set
                 EditGroups({_p}, player)
+            else if arg-2 = "eliminate":
+                {_p} is set
+                Eliminate({_p}, "&c%{_p}% was eliminated by %sender% using commands")
         else if arg-1 = "session":
             if arg-2 = "start":
                 broadcast "&a&lThe Session has started!"
@@ -318,7 +323,8 @@ command /squadlife [<text>] [<text>] [<text>] [<text>] [<text>]:
                             play sound "block.note_block.didgeridoo" to {_p}
                             send "&a%{_p}% has been added as a boogeyman."
         else if arg-1 = "start":
-            Start(all players where [game mode of input = survival])
+            send "&a%sender% has started a new season." to all operators
+            Start(all players where [game mode of input != spectator])
 
                     
 
